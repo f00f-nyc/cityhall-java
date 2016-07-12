@@ -1,32 +1,24 @@
 package com.digitalBorderlands.cityHall;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Unit test for Password. MD5 Hashing with City Hall conventions
  */
-public class PasswordTest 
-    extends TestCase
-{
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public PasswordTest( String testName )
-    {
-        super( testName );
-    }
-	
-    public void testEmptyPasswordIsEmpty()
+public class PasswordTest {
+    
+	@Test
+    public void emptyPasswordIsEmpty()
     {
 		String hashed = Password.hash("");
-        assertEquals( "Empty password shouldn't be hashed", "", hashed );
+		assertEquals("Empty password shouldn't be hashed", "", hashed);
     }
 	
-	public void testNonEmptyPasswordShouldBeHashed()
+	@Test
+	public void nonEmptyPasswordShouldBeHashed()
 	{
 		String hashed = Password.hash("password");
-        assertNotSame( "Non empty password should be hashed", 0, hashed.length() );
+		assertTrue("Non empty password should be hashed", hashed.length() > 0);
 	}
 }

@@ -10,18 +10,44 @@
   <name>cityHall</name>
   <url>http://www.digitalborderlands.com/cityhall</url>
 
-  <!-- <properties>
+  <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	<cityhallUrl>http://not.a.real.url/api/</cityhallUrl>
-  </properties> -->
+  </properties>
 
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>4.11</version>
       <scope>test</scope>
     </dependency>
+    
+    <dependency>
+    	<groupId>org.apache.httpcomponents</groupId>
+    	<artifactId>httpclient</artifactId>
+    	<version>4.5.2</version>
+    </dependency>
+    
+    <dependency>
+    	<groupId>org.apache.httpcomponents</groupId>
+    	<artifactId>httpclient</artifactId>
+    	<version>4.5.2</version>
+    	<classifier>tests</classifier>
+    </dependency>
+
+	<dependency>
+	    <groupId>org.picocontainer</groupId>
+	    <artifactId>picocontainer</artifactId>
+	    <version>2.14.1</version>
+	</dependency>
+	
+	<dependency>
+	    <groupId>com.google.code.gson</groupId>
+	    <artifactId>gson</artifactId>
+	    <version>2.3.1</version>
+	</dependency>
+	
   </dependencies>
   
   <licenses>
