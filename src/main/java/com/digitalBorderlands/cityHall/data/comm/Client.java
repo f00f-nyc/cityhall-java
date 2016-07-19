@@ -6,6 +6,7 @@ import java.util.HashMap;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
@@ -37,11 +38,13 @@ public class Client {
 		this.client = this.clientBuilder.build();
 		this.gson = new Gson();
 		this.target = HttpHost.create(apiUrl);
+		this.open = true;
 	}
 	
 	public void close() {
 		try {
 			this.client.close();
+			this.open = false;
 		} catch (IOException e) {
 			// suppress this error
 		}
@@ -49,9 +52,14 @@ public class Client {
 	
 	private HttpHost target;
 	private CloseableHttpClient client = null;
+	protected Boolean open;
 	protected Gson gson;
     protected PoolingHttpClientConnectionManager connManager;
     protected HttpClientBuilder clientBuilder;
+    
+    public Boolean isOpen() {
+    	return this.open;
+    }
     
 	public <T extends BaseResponse> T post(String location, HashMap<String,String> body, Class<T> type) throws CityHallException {
 		int status = -1;
@@ -121,5 +129,39 @@ public class Client {
 		} catch (ParseException e) {
 			throw new InvalidResponseException("Failed trying to reach: "+location.toString()+", unable to get entity from response: "+e.getMessage());
 		}
+	}
+
+	public <T extends BaseResponse> T delete(String location, Class<T> type) throws CityHallException {
+		int status = -1;
+		String message = "";
+		
+		try {
+			HttpDelete httpGet = new HttpDelete(location);
+			httpGet.setHeader("Accept", "application/json");
+			HttpClientContext context = HttpClientContext.create();
+			final HttpResponse response = this.client.execute(this.target, httpGet, context);
+		    status = response.getStatusLine().getStatusCode();
+		    message = EntityUtils.toString(response.getEntity());
+	    } catch(Exception e) { 
+	    	throw new InvalidRequestException("Failed trying to reach: "+location.toString(), e);
+	    } 
+		
+		if(status != 200) {
+        	throw new InvalidRequestException(location.toString(), status);
+        }
+        
+		try
+		{
+			T ret = this.gson.fromJson(message, type);
+	        if (ret.Response.equals("Ok")) {
+	        	return ret;
+	        }
+	        
+	        throw new ErrorFromCityHallException(ret.Message);
+		} catch (JsonSyntaxException e) {
+	        throw new InvalidResponseException("Failed trying to reach: "+location.toString());
+		} catch (ParseException e) {
+			throw new InvalidResponseException("Failed trying to reach: "+location.toString()+", unable to get entity from response: "+e.getMessage());
+		}		
 	}
 }

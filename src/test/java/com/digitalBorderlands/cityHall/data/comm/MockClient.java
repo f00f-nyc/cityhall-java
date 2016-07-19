@@ -20,7 +20,9 @@ public class MockClient {
 		private int index;
 		
 		@Override
-		public void close() { }
+		public void close() {
+			this.open = false;
+		}
 		
 		private Expected nextResponse() {
 			Assert.assertTrue("Client called more times than responses were provided", this.index < this.expected.length);
@@ -35,6 +37,11 @@ public class MockClient {
 		@Override
 		public <T extends BaseResponse> T post(String location, HashMap<String, String> body, Class<T> type) throws CityHallException {
 			return this.nextResponse().check("POST", location, body, type);
+		}
+		
+		@Override
+		public <T extends BaseResponse> T delete(String location, Class<T> type) throws CityHallException {
+			return this.nextResponse().check("DELETE", location, null, type);
 		}
 	}
 	
@@ -57,12 +64,20 @@ public class MockClient {
 		return client;
 	}
 	
-	public static Client withFirstCallAfterLogin(BaseResponse resp, String method) {
+	public static Client withFirstCallAfterLogin(BaseResponse resp, String method, String location, HashMap<String,String> body) {
 		Expected login = new Expected(Responses.ok(), "POST", "auth/", null);
 		Expected defaultEnvironment = new Expected(Responses.defaultEnvironment(), "GET");
-		Expected underTest = new Expected(resp, method);
+		Expected underTest = new Expected(resp, method, location, body);
 		Client client = new ClientWithResponses(new Expected[] { login, defaultEnvironment, underTest });
 		MockClient.replaceContainerClient(client);
 		return client;
+	}
+	
+	public static Client withFirstCallAfterLogin(BaseResponse resp, String method, String location) {
+		return MockClient.withFirstCallAfterLogin(resp, method, location, null);
+	}
+	
+	public static Client withFirstCallAfterLogin(BaseResponse resp, String method) {
+		return MockClient.withFirstCallAfterLogin(resp, method, null);
 	}	
 }

@@ -11,12 +11,13 @@ import com.digitalBorderlands.cityHall.data.comm.Client;
 import com.digitalBorderlands.cityHall.data.comm.Expected;
 import com.digitalBorderlands.cityHall.data.comm.MockClient;
 import com.digitalBorderlands.cityHall.data.comm.Responses;
+import com.digitalBorderlands.cityHall.exceptions.NotLoggedInException;
 
 /**
  * Unit test for Settings, the entry point for interfacing with City Hall
  */
 public class SettingsTest {
-	private static String GetHostname() {
+	static String GetHostname() {
 		try {
 			return InetAddress.getLocalHost().getHostName();
 		} catch (UnknownHostException e) {
@@ -29,7 +30,7 @@ public class SettingsTest {
 		MockClient.withRawResponses(Responses.ok(), Responses.defaultEnvironment());
 		Settings settings = new Settings();
 		Assert.assertTrue(settings.isLoggedIn());
-		Assert.assertEquals(Responses.defaultEnvironment().Value, settings.getDefaultEnviornment());
+		Assert.assertEquals(Responses.defaultEnvironment().Value, settings.environments.getDefaultEnviornment());
 	}
 	
 	@Test
@@ -78,13 +79,18 @@ public class SettingsTest {
 	}
 	
 	@Test
-	public void getDefaultEnvironment() throws Exception {
-		String location = String.format("auth/user/%s/default/", SettingsTest.GetHostname());
-		Expected auth = new Expected(Responses.ok(), null);
-		Expected def = new Expected(Responses.defaultEnvironment(), "GET", location, null);
-		
-		MockClient.withRawResponses(new Expected[] { auth, def });
+	public void logoutIsHonored() throws Exception {
+		MockClient.withFirstCallAfterLogin(Responses.ok(), "DELETE", "auth/");
 		Settings settings = new Settings();
-		Assert.assertEquals(Responses.defaultEnvironment().Value, settings.getDefaultEnviornment());
+		settings.logout();
+		Assert.assertFalse(settings.isLoggedIn());
+	}
+	
+	@Test(expected=NotLoggedInException.class)
+	public void testClientOpen() throws Exception {
+		MockClient.withFirstCallAfterLogin(Responses.ok(), null);
+		Settings settings = new Settings();
+		settings.logout();
+		settings.ensureLoggedIn();
 	}
 }

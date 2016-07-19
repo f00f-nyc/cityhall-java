@@ -11,6 +11,13 @@ public class Responses {
 		return ret;
 	}
 	
+	public static BaseResponse notOk() {
+		BaseResponse ret = new BaseResponse();
+		ret.Message = "Some failure message";
+		ret.Response = "Failure";
+		return ret;
+	}
+	
 	public static ValueResponse defaultEnvironment() {
 		ValueResponse ret = new ValueResponse();
 		ret.Message = null;

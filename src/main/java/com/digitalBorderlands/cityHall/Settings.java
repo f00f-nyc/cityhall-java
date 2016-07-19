@@ -11,15 +11,22 @@ import com.digitalBorderlands.cityHall.data.comm.Client;
 import com.digitalBorderlands.cityHall.data.responses.BaseResponse;
 import com.digitalBorderlands.cityHall.data.responses.ValueResponse;
 import com.digitalBorderlands.cityHall.exceptions.CityHallException;
+import com.digitalBorderlands.cityHall.exceptions.NotLoggedInException;
 
 public class Settings {
-	
+
 	private enum Status {
 		NotLoggedIn,
 		LoggedIn,
 		LoggedOut
 	}
 	
+	private static class EnvInstance extends Environments { 
+		public EnvInstance(Client client, Settings parent, String defaultEnvironment) {
+			super(client, parent, defaultEnvironment);
+		}
+	}
+
 	public Settings() throws CityHallException {
 		this(Settings.GetHostname(), "", Container.Self.getComponent(Client.class)); 
 	}
@@ -29,14 +36,17 @@ public class Settings {
 		this.client = client;
 		
 		this.login(password);
-		this.getDefaultEnvironment();
+		String defaultEnvironment = this.getDefaultEnvironment();
+		
+		this.environments = new EnvInstance(this.client, this, defaultEnvironment);
 	}
 
 	private Status loggedIn = Status.NotLoggedIn;
 	private final String user;
-	private String defaultEnvironment = "";
 	private final Client client;
 	private final Lock lock = new ReentrantLock();
+	
+	public final Environments environments;
 	
 	private static String GetHostname() {
 		try {
@@ -62,23 +72,38 @@ public class Settings {
 		}
 	}
 	
-	private void getDefaultEnvironment() throws CityHallException {
-		if (this.loggedIn == Status.LoggedIn) {
-			String location = String.format("auth/user/%s/default/", this.user);
-			ValueResponse dev = this.client.get(location, ValueResponse.class);
-			this.defaultEnvironment = dev.Value;
+	public void logout() throws CityHallException {
+		try {
+			this.lock.lock();
+			
+			if (this.loggedIn == Status.LoggedIn) {
+				this.client.delete("auth/", BaseResponse.class);
+				this.loggedIn = Status.LoggedOut;
+				this.client.close();
+			}
 		}
+		finally {
+			this.lock.unlock();
+		}
+	}
+	
+	private String getDefaultEnvironment() throws CityHallException {
+		String location = String.format("auth/user/%s/default/", this.user);
+		ValueResponse dev = this.client.get(location, ValueResponse.class);
+		return dev.Value;
 	}
 	
 	public String getUser()	{
 		return this.user;
 	}
 	
-	public String getDefaultEnviornment() {
-		return this.defaultEnvironment;
-	}
-	
 	public Boolean isLoggedIn() {
 		return this.loggedIn == Status.LoggedIn;
-	}	
+	}
+
+    void ensureLoggedIn() throws CityHallException {
+    	if (!this.isLoggedIn()) {
+    		throw new NotLoggedInException();
+    	}
+    }
 }
