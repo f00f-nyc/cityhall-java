@@ -21,7 +21,7 @@ The intention is to use the built-in City Hall web site for actual settings mana
 
 ```Java
 	Settings settings = new Settings();
-	String value = settings.GetValue("/app/some_value");
+	String value = settings.get("/app/some_value");
 ```
 
 LICENSE
