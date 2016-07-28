@@ -5,9 +5,12 @@ import java.util.HashMap;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.digitalBorderlands.cityHall.data.EnvironmentInfo;
+import com.digitalBorderlands.cityHall.data.EnvironmentRights;
 import com.digitalBorderlands.cityHall.data.comm.Expected;
 import com.digitalBorderlands.cityHall.data.comm.MockClient;
 import com.digitalBorderlands.cityHall.data.comm.Responses;
+import com.digitalBorderlands.cityHall.data.responses.EnvironmentResponse;
 
 public class EnvironmentsTest {
 	
@@ -35,7 +38,44 @@ public class EnvironmentsTest {
 		};
 		
 		setDefaultEnv.run(new Settings());
-		
 		ErrorTester.logOutWorks(setDefaultEnv);
+	}
+	
+	@Test
+	public void getEnvironment() throws Exception {
+		String location = "auth/env/dev/";
+		EnvironmentResponse devResponse = Responses.devEnvironment();
+		MockClient.withFirstCallAfterLogin(devResponse, "GET", location, null);
+		
+		Testable getEnvironment = settings -> {
+			EnvironmentInfo dev = settings.environments.get("dev");
+			
+			Assert.assertEquals(devResponse.Users.size(), dev.Rights.length);
+			Object[] devSet = devResponse.Users.entrySet().toArray();
+			String[] keys = devResponse.Users.keySet().toArray(new String[devSet.length]);
+			Integer[] values = devResponse.Users.values().toArray(new Integer[devSet.length]);
+			
+			for (int i=0; i<devSet.length; i++) {
+				EnvironmentRights envResponse = dev.Rights[i];
+				Assert.assertEquals(keys[i], envResponse.User);
+				Assert.assertEquals(values[i].intValue(), envResponse.Rights.intValue());
+			}
+		};
+		
+		getEnvironment.run(new Settings());
+		ErrorTester.logOutWorks(getEnvironment);
+	}
+	
+	@Test
+	public void createEnvironment() throws Exception {
+		String location = "auth/env/qa/";
+		MockClient.withFirstCallAfterLogin(Responses.ok(), "POST", location, null);
+		
+		Testable createEnvironment = settings -> {
+			settings.environments.create("qa");
+		};
+		
+		createEnvironment.run(new Settings());
+		ErrorTester.logOutWorks(createEnvironment);		
 	}
 }

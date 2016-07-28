@@ -1,9 +1,15 @@
 package com.digitalBorderlands.cityHall;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
 
+import com.digitalBorderlands.cityHall.data.EnvironmentInfo;
+import com.digitalBorderlands.cityHall.data.EnvironmentRights;
 import com.digitalBorderlands.cityHall.data.comm.Client;
 import com.digitalBorderlands.cityHall.data.responses.BaseResponse;
+import com.digitalBorderlands.cityHall.data.responses.EnvironmentResponse;
 import com.digitalBorderlands.cityHall.exceptions.CityHallException;
 
 public abstract class Environments {
@@ -28,5 +34,24 @@ public abstract class Environments {
 		body.put("env", defaultEnvironment);
 		this.client.post(location, body, BaseResponse.class);
 		this.defaultEnvironment = defaultEnvironment;
+	}
+	
+	public EnvironmentInfo get(String environmentName) throws CityHallException {
+		this.parent.ensureLoggedIn();
+		String location = String.format("auth/env/%s/", environmentName);
+		EnvironmentResponse res = this.client.get(location, EnvironmentResponse.class);
+		EnvironmentInfo ret = new EnvironmentInfo();
+		List<EnvironmentRights> list = new ArrayList<EnvironmentRights>(); 
+		for(Entry<String,Integer> entry : res.Users.entrySet()) {
+			list.add(new EnvironmentRights(entry.getKey(), entry.getValue()));
+		}
+		ret.Rights = list.toArray(new EnvironmentRights[list.size()]);
+		return ret;
+	}
+	
+	public void create(String environmentName) throws CityHallException {
+		this.parent.ensureLoggedIn();
+		String location = String.format("auth/env/%s/", environmentName);
+		this.client.post(location, null, BaseResponse.class);
 	}
 }

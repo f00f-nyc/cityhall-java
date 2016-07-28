@@ -36,7 +36,6 @@ public class Client {
                 .setDefaultSocketConfig(socketConfig)
                 .setConnectionManager(this.connManager);
 		this.client = this.clientBuilder.build();
-		this.gson = new Gson();
 		this.target = HttpHost.create(apiUrl);
 		this.open = true;
 	}
@@ -50,10 +49,10 @@ public class Client {
 		}
 	}
 	
+	private static Gson gson = new Gson();
 	private HttpHost target;
 	private CloseableHttpClient client = null;
 	protected Boolean open;
-	protected Gson gson;
     protected PoolingHttpClientConnectionManager connManager;
     protected HttpClientBuilder clientBuilder;
     
@@ -61,23 +60,21 @@ public class Client {
     	return this.open;
     }
     
-	public <T extends BaseResponse> T post(String location, HashMap<String,String> body, Class<T> type) throws CityHallException {
-		int status = -1;
-		String message = "";
-		
-		try {
-			HttpPost httpPost = new HttpPost(location);
-			String bodyJson = this.gson.toJson(body, body.getClass());
-			httpPost.setEntity(new StringEntity(bodyJson));
-			httpPost.setHeader("Accept", "application/json");
-			httpPost.setHeader("Content-Type", "application/json");
-			HttpClientContext context = HttpClientContext.create();
-			final HttpResponse response = this.client.execute(this.target, httpPost, context);
+    private interface serverCall {
+    	public HttpResponse run() throws Exception;
+    }
+    
+    private <T extends BaseResponse> T run(String location, serverCall call, Class<T> type) throws CityHallException {
+    	int status = -1;
+    	String message = "";
+    	
+    	try {
+    		final HttpResponse response = call.run();
 		    status = response.getStatusLine().getStatusCode();
 		    message = EntityUtils.toString(response.getEntity());
-	    } catch(Exception e) { 
-	    	throw new InvalidRequestException("Failed trying to reach: "+location.toString(), e);
-	    } 
+    	} catch (Exception e) {
+    		throw new InvalidRequestException("Failed trying to reach: "+location, e);
+    	} 
 		
 		if(status != 200) {
         	throw new InvalidRequestException(location.toString(), status);
@@ -85,40 +82,7 @@ public class Client {
         
 		try
 		{
-			T ret = this.gson.fromJson(message, type);
-	        if (ret.Response.equals("Ok")) {
-	        	return ret;
-	        }
-	        
-	        throw new ErrorFromCityHallException(ret.Message);
-		} catch (JsonSyntaxException e) {
-	        throw new InvalidResponseException("Failed trying to reach: "+location.toString());
-		} catch (ParseException e) {
-			throw new InvalidResponseException("Failed trying to reach: "+location.toString()+", unable to get entity from response: "+e.getMessage());
-		}	}
-
-	public <T extends BaseResponse> T get(String location, Class<T> type) throws CityHallException {
-		int status = -1;
-		String message = "";
-		
-		try {
-			HttpGet httpGet = new HttpGet(location);
-			httpGet.setHeader("Accept", "application/json");
-			HttpClientContext context = HttpClientContext.create();
-			final HttpResponse response = this.client.execute(this.target, httpGet, context);
-		    status = response.getStatusLine().getStatusCode();
-		    message = EntityUtils.toString(response.getEntity());
-	    } catch(Exception e) { 
-	    	throw new InvalidRequestException("Failed trying to reach: "+location.toString(), e);
-	    } 
-		
-		if(status != 200) {
-        	throw new InvalidRequestException(location.toString(), status);
-        }
-        
-		try
-		{
-			T ret = this.gson.fromJson(message, type);
+			T ret = BaseResponse.fromJson(message, type);
 	        if (ret.Response.equals("Ok")) {
 	        	return ret;
 	        }
@@ -129,39 +93,42 @@ public class Client {
 		} catch (ParseException e) {
 			throw new InvalidResponseException("Failed trying to reach: "+location.toString()+", unable to get entity from response: "+e.getMessage());
 		}
+    }
+    
+	public <T extends BaseResponse> T post(String location, HashMap<String,String> body, Class<T> type) throws CityHallException {
+
+		serverCall call = () -> {
+			HttpPost httpPost = new HttpPost(location);
+			String bodyJson = Client.gson.toJson(body, body.getClass());
+			httpPost.setEntity(new StringEntity(bodyJson));
+			httpPost.setHeader("Accept", "application/json");
+			httpPost.setHeader("Content-Type", "application/json");
+			HttpClientContext context = HttpClientContext.create();
+			return this.client.execute(this.target, httpPost, context);
+		};
+		
+		return this.run(location, call, type);	
+	}
+
+	public <T extends BaseResponse> T get(String location, Class<T> type) throws CityHallException {
+		serverCall call = () -> {
+			HttpGet httpGet = new HttpGet(location);
+			httpGet.setHeader("Accept", "application/json");
+			HttpClientContext context = HttpClientContext.create();
+			return this.client.execute(this.target, httpGet, context);
+		};
+		
+		return this.run(location, call, type);
 	}
 
 	public <T extends BaseResponse> T delete(String location, Class<T> type) throws CityHallException {
-		int status = -1;
-		String message = "";
-		
-		try {
+		serverCall call = () -> {
 			HttpDelete httpGet = new HttpDelete(location);
 			httpGet.setHeader("Accept", "application/json");
 			HttpClientContext context = HttpClientContext.create();
-			final HttpResponse response = this.client.execute(this.target, httpGet, context);
-		    status = response.getStatusLine().getStatusCode();
-		    message = EntityUtils.toString(response.getEntity());
-	    } catch(Exception e) { 
-	    	throw new InvalidRequestException("Failed trying to reach: "+location.toString(), e);
-	    } 
-		
-		if(status != 200) {
-        	throw new InvalidRequestException(location.toString(), status);
-        }
-        
-		try
-		{
-			T ret = this.gson.fromJson(message, type);
-	        if (ret.Response.equals("Ok")) {
-	        	return ret;
-	        }
-	        
-	        throw new ErrorFromCityHallException(ret.Message);
-		} catch (JsonSyntaxException e) {
-	        throw new InvalidResponseException("Failed trying to reach: "+location.toString());
-		} catch (ParseException e) {
-			throw new InvalidResponseException("Failed trying to reach: "+location.toString()+", unable to get entity from response: "+e.getMessage());
-		}		
+			return this.client.execute(this.target, httpGet, context);
+	    };
+	    
+	    return this.run(location, call, type);
 	}
 }
