@@ -22,9 +22,24 @@ public class Settings {
 	}
 	
 	private static class EnvInstance extends Environments { 
-		public EnvInstance(Client client, Settings parent, String defaultEnvironment) {
-			super(client, parent, defaultEnvironment);
+		public EnvInstance(Settings parent, String defaultEnvironment) {
+			super(parent, defaultEnvironment);
 		}
+	}
+	
+	<T extends BaseResponse> T post(String location, HashMap<String,String> body, Class<T> type) throws CityHallException {
+		this.ensureLoggedIn();
+		return this.client.post(location, body, type);
+	}
+	
+	<T extends BaseResponse> T get(String location, Class<T> type) throws CityHallException {
+		this.ensureLoggedIn();
+		return this.client.get(location, type);
+	}
+	
+	<T extends BaseResponse> T delete(String location, Class<T> type) throws CityHallException {
+		this.ensureLoggedIn();
+		return this.client.delete(location, type);
 	}
 
 	public Settings() throws CityHallException {
@@ -38,7 +53,7 @@ public class Settings {
 		this.login(password);
 		String defaultEnvironment = this.getDefaultEnvironment();
 		
-		this.environments = new EnvInstance(this.client, this, defaultEnvironment);
+		this.environments = new EnvInstance(this, defaultEnvironment);
 	}
 
 	private Status loggedIn = Status.NotLoggedIn;
