@@ -93,4 +93,19 @@ public class SettingsTest {
 		settings.logout();
 		settings.ensureLoggedIn();
 	}
+
+	private void updatePassword(String password) throws Exception {
+		HashMap<String, String> body = new HashMap<String, String>();
+		body.put("passhash", Password.hash(password));
+		String location = String.format("auth/user/%s/", SettingsTest.GetHostname());
+		MockClient.withFirstCallAfterLogin(Responses.ok(), "PUT", location, body);
+		new Settings().updatePassword(password);
+		ErrorTester.logOutWorks(settings -> settings.updatePassword(password));
+	}
+	
+	@Test
+	public void updatePassword() throws Exception {
+		this.updatePassword("");
+		this.updatePassword("password");
+	}
 }

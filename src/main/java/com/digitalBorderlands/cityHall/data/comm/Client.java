@@ -9,6 +9,7 @@ import org.apache.http.ParseException;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.entity.StringEntity;
@@ -38,6 +39,7 @@ public class Client {
 		this.client = this.clientBuilder.build();
 		this.target = HttpHost.create(apiUrl);
 		this.open = true;
+		this.context = HttpClientContext.create();
 	}
 	
 	public void close() {
@@ -55,6 +57,7 @@ public class Client {
 	protected Boolean open;
     protected PoolingHttpClientConnectionManager connManager;
     protected HttpClientBuilder clientBuilder;
+    protected HttpClientContext context;
     
     public Boolean isOpen() {
     	return this.open;
@@ -96,15 +99,13 @@ public class Client {
     }
     
 	public <T extends BaseResponse> T post(String location, HashMap<String,String> body, Class<T> type) throws CityHallException {
-
 		serverCall call = () -> {
 			HttpPost httpPost = new HttpPost(location);
 			String bodyJson = Client.gson.toJson(body, body.getClass());
 			httpPost.setEntity(new StringEntity(bodyJson));
 			httpPost.setHeader("Accept", "application/json");
 			httpPost.setHeader("Content-Type", "application/json");
-			HttpClientContext context = HttpClientContext.create();
-			return this.client.execute(this.target, httpPost, context);
+			return this.client.execute(this.target, httpPost, this.context);
 		};
 		
 		return this.run(location, call, type);	
@@ -114,8 +115,7 @@ public class Client {
 		serverCall call = () -> {
 			HttpGet httpGet = new HttpGet(location);
 			httpGet.setHeader("Accept", "application/json");
-			HttpClientContext context = HttpClientContext.create();
-			return this.client.execute(this.target, httpGet, context);
+			return this.client.execute(this.target, httpGet, this.context);
 		};
 		
 		return this.run(location, call, type);
@@ -125,10 +125,22 @@ public class Client {
 		serverCall call = () -> {
 			HttpDelete httpGet = new HttpDelete(location);
 			httpGet.setHeader("Accept", "application/json");
-			HttpClientContext context = HttpClientContext.create();
-			return this.client.execute(this.target, httpGet, context);
+			return this.client.execute(this.target, httpGet, this.context);
 	    };
 	    
 	    return this.run(location, call, type);
+	}
+	
+	public <T extends BaseResponse> T put(String location, HashMap<String, String> body, Class<T> type) throws CityHallException {
+		serverCall call = () -> {
+			HttpPut httpPut = new HttpPut(location);
+			String bodyJson = Client.gson.toJson(body, body.getClass());
+			httpPut.setEntity(new StringEntity(bodyJson));
+			httpPut.setHeader("Accept", "application/json");
+			httpPut.setHeader("Content-Type", "application/json");
+			return this.client.execute(this.target, httpPut, this.context);
+		};
+		
+		return this.run(location, call, type);
 	}
 }

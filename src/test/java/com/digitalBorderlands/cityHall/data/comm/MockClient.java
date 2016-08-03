@@ -43,6 +43,11 @@ public class MockClient {
 		public <T extends BaseResponse> T delete(String location, Class<T> type) throws CityHallException {
 			return this.nextResponse().check("DELETE", location, null, type);
 		}
+		
+		@Override
+		public <T extends BaseResponse> T put(String location, HashMap<String, String> body, Class<T> type) throws CityHallException {
+			return this.nextResponse().check("PUT", location, body, type);
+		}
 	}
 	
 	private static void replaceContainerClient(Client client) {

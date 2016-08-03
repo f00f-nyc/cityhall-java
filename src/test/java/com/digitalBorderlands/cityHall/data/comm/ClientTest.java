@@ -134,6 +134,21 @@ public class ClientTest extends LocalServerTestBase {
 		client.close();
 	}
 	
+	@Test
+	public void putReturnsSuccess() throws Exception {
+		String success = "{\"Response\":\"Ok\"}";
+		String url = this.register(success, HttpStatus.SC_OK, "{\"key\":\"value\"}", "PUT");
+		Client client = new Client(url);
+		
+		HashMap<String, String> body = new HashMap<String, String>();
+		body.put("key", "value");
+		
+		BaseResponse response = client.put("/", body, BaseResponse.class);
+		Assert.assertEquals("Ok", response.Response);
+		Assert.assertTrue(response.Message == null);
+		client.close();
+	}
+	
 	@Test(expected=ErrorFromCityHallException.class)
 	public void getReturnsFailure() throws Exception {
 		String message = "Some failure message";
@@ -178,6 +193,21 @@ public class ClientTest extends LocalServerTestBase {
 			throw ex;
 		}
 	}
+	
+	@Test(expected=ErrorFromCityHallException.class)
+	public void putReturnsFailure() throws Exception {
+		String message = "Some failure message";
+		String failure = "{\"Response\":\"Failure\",\"Message\":\""+message+"\"}";
+		String url = this.register(failure, HttpStatus.SC_OK, null, "PUT");
+		Client client = new Client(url);
+		try {
+			client.put("/some_route", new HashMap<String,String>(), BaseResponse.class);
+		} catch (Exception ex) {
+			Assert.assertEquals(message, ex.getMessage());
+			client.close();
+			throw ex;
+		}
+	}
 
 	@Test(expected=InvalidRequestException.class)
 	public void getReturns507() throws Exception {
@@ -209,6 +239,18 @@ public class ClientTest extends LocalServerTestBase {
 		Client client = new Client(url);
 		try {
 			client.post("/some_route", new HashMap<String, String>(), BaseResponse.class);
+		} catch (Exception ex) {
+			client.close();
+			throw ex;
+		}
+	}
+	
+	@Test(expected=InvalidRequestException.class)
+	public void putReturns507() throws Exception {
+		String url = this.register("Some random error mesage", HttpStatus.SC_INSUFFICIENT_STORAGE, null, "PUT");
+		Client client = new Client(url);
+		try {
+			client.put("/some_route", new HashMap<String, String>(), BaseResponse.class);
 		} catch (Exception ex) {
 			client.close();
 			throw ex;

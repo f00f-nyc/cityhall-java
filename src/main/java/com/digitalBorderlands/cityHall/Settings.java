@@ -27,6 +27,12 @@ public class Settings {
 		}
 	}
 	
+	private static class UsersInstance extends Users {
+		public UsersInstance(Settings parent) {
+			super(parent);
+		}
+	}
+	
 	<T extends BaseResponse> T post(String location, HashMap<String,String> body, Class<T> type) throws CityHallException {
 		this.ensureLoggedIn();
 		return this.client.post(location, body, type);
@@ -41,6 +47,11 @@ public class Settings {
 		this.ensureLoggedIn();
 		return this.client.delete(location, type);
 	}
+	
+	<T extends BaseResponse> T put(String location, HashMap<String,String> body, Class<T> type) throws CityHallException {
+		this.ensureLoggedIn();
+		return this.client.put(location, body, type);
+	}
 
 	public Settings() throws CityHallException {
 		this(Settings.GetHostname(), "", Container.Self.getComponent(Client.class)); 
@@ -54,6 +65,7 @@ public class Settings {
 		String defaultEnvironment = this.getDefaultEnvironment();
 		
 		this.environments = new EnvInstance(this, defaultEnvironment);
+		this.users = new UsersInstance(this);
 	}
 
 	private Status loggedIn = Status.NotLoggedIn;
@@ -62,6 +74,7 @@ public class Settings {
 	private final Lock lock = new ReentrantLock();
 	
 	public final Environments environments;
+	public final Users users;
 	
 	private static String GetHostname() {
 		try {
@@ -114,6 +127,13 @@ public class Settings {
 	
 	public Boolean isLoggedIn() {
 		return this.loggedIn == Status.LoggedIn;
+	}
+	
+	public void updatePassword(String password) throws CityHallException {
+		String location = String.format("auth/user/%s/", this.user);
+		HashMap<String, String> body = new HashMap<String, String>();
+		body.put("passhash", Password.hash(password));
+		this.put(location, body, BaseResponse.class);		
 	}
 
     void ensureLoggedIn() throws CityHallException {

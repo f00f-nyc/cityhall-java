@@ -2,6 +2,7 @@ package com.digitalBorderlands.cityHall.data.comm;
 
 import com.digitalBorderlands.cityHall.data.responses.BaseResponse;
 import com.digitalBorderlands.cityHall.data.responses.EnvironmentResponse;
+import com.digitalBorderlands.cityHall.data.responses.UserResponse;
 import com.digitalBorderlands.cityHall.data.responses.ValueResponse;
 import com.google.gson.Gson;
 
@@ -38,6 +39,13 @@ public class Responses {
 		return Responses.responseFromJson(
 				"{\"Response\": \"Ok\", \"Users\": {\"test_user\": \"4\", \"some_user\": \"1\", \"cityhall\": \"4\"}}",
 				EnvironmentResponse.class
+		);
+	}
+	
+	public static UserResponse userInfo() {
+		return Responses.responseFromJson(
+				"{\"Response\": \"Ok\", \"Environments\": {\"dev\": 4, \"auto\": 1, \"users\": 1}}",
+				UserResponse.class
 		);
 	}
 }

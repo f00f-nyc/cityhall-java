@@ -1,8 +1,9 @@
 package com.digitalBorderlands.cityHall;
 
-import java.security.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
-public class Password {
+class Password {
 	public static String hash(String password) {
 		try {
 			if ((password == null) || password.trim().isEmpty()) {
