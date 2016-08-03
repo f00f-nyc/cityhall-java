@@ -40,7 +40,7 @@ public abstract class Environments {
 		for(Entry<String,Integer> entry : res.Users.entrySet()) {
 			list.add(new EnvironmentRights(entry.getKey(), entry.getValue()));
 		}
-		ret.Rights = list.toArray(new EnvironmentRights[list.size()]);
+		ret.rights = list.toArray(new EnvironmentRights[list.size()]);
 		return ret;
 	}
 	
