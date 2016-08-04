@@ -12,6 +12,7 @@ public class Expected {
 	public final String Method;
 	public final String Location;
 	public final HashMap<String, String> Body;
+	public final HashMap<String, String> QueryParams;
 	
 	public Expected() {
 		this(Responses.ok(), null, null, null);
@@ -26,6 +27,15 @@ public class Expected {
 		this.Method = method;
 		this.Location = location;
 		this.Body = body;
+		this.QueryParams = null;
+	}
+	
+	public Expected(BaseResponse response, String location, HashMap<String, String> queryParams) {
+		this.Response = response;
+		this.Method = "GET";
+		this.Location = location;
+		this.Body = null;
+		this.QueryParams = queryParams;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -49,5 +59,20 @@ public class Expected {
 
 		Assert.assertEquals(type, this.Response.getClass());
 		return (T)this.Response;
+	}
+	
+	public <T extends BaseResponse> T checkGet(String location, HashMap<String, String> queryParams, Class<T> type) {
+		T ret = this.check("GET", location,  null, type);
+		
+		if ((queryParams != null) && (this.QueryParams != null)) {
+			Assert.assertEquals(queryParams.size(), this.QueryParams.size());
+			
+			for (Entry<String, String> entry : this.QueryParams.entrySet()) {
+				Assert.assertTrue(queryParams.containsKey(entry.getKey()));
+				Assert.assertEquals(entry.getValue(), queryParams.get(entry.getKey()));
+			}
+		}
+		
+		return ret;
 	}
 }

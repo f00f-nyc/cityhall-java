@@ -2,6 +2,7 @@ package com.digitalBorderlands.cityHall.data.comm;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -11,6 +12,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -111,9 +113,18 @@ public class Client {
 		return this.run(location, call, type);	
 	}
 
-	public <T extends BaseResponse> T get(String location, Class<T> type) throws CityHallException {
+	public <T extends BaseResponse> T get(String location, HashMap<String, String> queryParams, Class<T> type) throws CityHallException {
 		serverCall call = () -> {
-			HttpGet httpGet = new HttpGet(location);
+			HttpGet httpGet;
+			if (queryParams == null) {
+				httpGet = new HttpGet(location);
+			} else {
+				URIBuilder builder = new URIBuilder(location);
+				for (Entry<String, String> entry : queryParams.entrySet()) {
+					builder.addParameter(entry.getKey(), entry.getValue());
+				}
+				httpGet = new HttpGet(builder.build());
+			}
 			httpGet.setHeader("Accept", "application/json");
 			return this.client.execute(this.target, httpGet, this.context);
 		};

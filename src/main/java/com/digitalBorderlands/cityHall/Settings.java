@@ -33,6 +33,12 @@ public class Settings {
 		}
 	}
 	
+	private static class ValuesInstance extends Values {
+		public ValuesInstance(Settings parent) {
+			super(parent);
+		}
+	}
+	
 	<T extends BaseResponse> T post(String location, HashMap<String,String> body, Class<T> type) throws CityHallException {
 		this.ensureLoggedIn();
 		return this.client.post(location, body, type);
@@ -40,7 +46,7 @@ public class Settings {
 	
 	<T extends BaseResponse> T get(String location, Class<T> type) throws CityHallException {
 		this.ensureLoggedIn();
-		return this.client.get(location, type);
+		return this.client.get(location, null, type);
 	}
 	
 	<T extends BaseResponse> T delete(String location, Class<T> type) throws CityHallException {
@@ -66,6 +72,7 @@ public class Settings {
 		
 		this.environments = new EnvInstance(this, defaultEnvironment);
 		this.users = new UsersInstance(this);
+		this.values = new ValuesInstance(this);
 	}
 
 	private Status loggedIn = Status.NotLoggedIn;
@@ -75,6 +82,7 @@ public class Settings {
 	
 	public final Environments environments;
 	public final Users users;
+	public final Values values;
 	
 	private static String GetHostname() {
 		try {
@@ -117,8 +125,8 @@ public class Settings {
 	
 	private String getDefaultEnvironment() throws CityHallException {
 		String location = String.format("auth/user/%s/default/", this.user);
-		ValueResponse dev = this.client.get(location, ValueResponse.class);
-		return dev.Value;
+		ValueResponse dev = this.client.get(location, null, ValueResponse.class);
+		return dev.value;
 	}
 	
 	public String getUser()	{

@@ -30,8 +30,8 @@ public class MockClient {
 		}
 		
 		@Override
-		public <T extends BaseResponse> T get(String location, Class<T> type) throws CityHallException {
-			return this.nextResponse().check("GET", location, null, type);
+		public <T extends BaseResponse> T get(String location, HashMap<String,String> queryParams, Class<T> type) throws CityHallException {
+			return this.nextResponse().checkGet(location, queryParams, type);
 		}
 		
 		@Override
@@ -69,17 +69,27 @@ public class MockClient {
 		return client;
 	}
 	
-	public static Client withFirstCallAfterLogin(BaseResponse resp, String method, String location, HashMap<String,String> body) {
+	private static Client withFirstCallAfterLogin(Expected underTest) {
 		Expected login = new Expected(Responses.ok(), "POST", "auth/", null);
-		Expected defaultEnvironment = new Expected(Responses.defaultEnvironment(), "GET");
-		Expected underTest = new Expected(resp, method, location, body);
+		Expected defaultEnvironment = new Expected(Responses.defaultEnvironment(), null, null);
 		Client client = new ClientWithResponses(new Expected[] { login, defaultEnvironment, underTest });
 		MockClient.replaceContainerClient(client);
 		return client;
 	}
 	
+	public static Client withFirstCallAfterLogin(BaseResponse resp, String method, String location, HashMap<String,String> body) {		
+		Expected underTest = new Expected(resp, method, location, body);
+		return MockClient.withFirstCallAfterLogin(underTest);
+	}
+	
 	public static Client withFirstCallAfterLogin(BaseResponse resp, String method, String location) {
-		return MockClient.withFirstCallAfterLogin(resp, method, location, null);
+		Expected underTest = new Expected(resp, method, location, null);
+		return MockClient.withFirstCallAfterLogin(underTest);
+	}
+	
+	public static Client withGetCallAfterLogin(BaseResponse resp, String location, HashMap<String,String> queryParams) {
+		Expected underTest = new Expected(resp, location, queryParams);
+		return MockClient.withFirstCallAfterLogin(underTest);
 	}
 	
 	public static Client withFirstCallAfterLogin(BaseResponse resp, String method) {

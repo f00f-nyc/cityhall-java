@@ -91,7 +91,7 @@ public class ClientTest extends LocalServerTestBase {
 		Container.Self.addComponent(Client.class, Client.class, new ConstantParameter(url));
 	
 		Client client = Container.Self.getComponent(Client.class);
-		BaseResponse response = client.get("/some_route", BaseResponse.class);
+		BaseResponse response = client.get("/some_route", null, BaseResponse.class);
 		Assert.assertEquals("Ok", response.Response);
 		client.close();
 	}
@@ -101,7 +101,7 @@ public class ClientTest extends LocalServerTestBase {
 		String success = "{\"Response\":\"Ok\"}";
 		String url = this.register(success, HttpStatus.SC_OK, null, "GET");
 		Client client = new Client(url);
-		BaseResponse response = client.get("/some_route", BaseResponse.class);
+		BaseResponse response = client.get("/some_route", null, BaseResponse.class);
 		Assert.assertEquals("Ok", response.Response);
 		Assert.assertTrue(response.Message == null); 
 		client.close();
@@ -156,7 +156,7 @@ public class ClientTest extends LocalServerTestBase {
 		String url = this.register(failure, HttpStatus.SC_OK, null, "GET");
 		Client client = new Client(url);
 		try {
-			client.get("/some_route", BaseResponse.class);
+			client.get("/some_route", null, BaseResponse.class);
 		} catch (Exception ex) {
 			Assert.assertEquals(message, ex.getMessage());
 			client.close();
@@ -214,7 +214,7 @@ public class ClientTest extends LocalServerTestBase {
 		String url = this.register("Some random error mesage", HttpStatus.SC_INSUFFICIENT_STORAGE, null, "GET");
 		Client client = new Client(url);
 		try {
-			client.get("/some_route", BaseResponse.class);
+			client.get("/some_route", null, BaseResponse.class);
 		} catch (Exception ex) {
 			client.close();
 			throw ex;

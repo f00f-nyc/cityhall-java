@@ -30,7 +30,7 @@ public class SettingsTest {
 		MockClient.withRawResponses(Responses.ok(), Responses.defaultEnvironment());
 		Settings settings = new Settings();
 		Assert.assertTrue(settings.isLoggedIn());
-		Assert.assertEquals(Responses.defaultEnvironment().Value, settings.environments.getDefaultEnviornment());
+		Assert.assertEquals(Responses.defaultEnvironment().value, settings.environments.getDefaultEnviornment());
 	}
 	
 	@Test

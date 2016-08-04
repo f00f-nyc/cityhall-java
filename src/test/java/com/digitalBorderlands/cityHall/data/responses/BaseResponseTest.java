@@ -43,7 +43,7 @@ public class BaseResponseTest {
 		Assert.assertNotNull(res);
 		Assert.assertEquals(response, res.Response);
 		Assert.assertEquals(message, res.Message);
-		Assert.assertEquals(value, res.Value);
-		Assert.assertEquals(protect, res.Protect);
+		Assert.assertEquals(value, res.value);
+		Assert.assertEquals(protect, res.protect);
 	}
 }

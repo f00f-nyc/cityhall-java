@@ -19,7 +19,7 @@ public class UsersTest {
 	public void getUser() throws Exception {
 		String location = "/auth/user/test_user/";
 		UserResponse testUserResponse = Responses.userInfo();
-		MockClient.withFirstCallAfterLogin(testUserResponse, "GET", location, null);
+		MockClient.withGetCallAfterLogin(testUserResponse, location, null);
 		
 		Testable getUser = settings -> {
 			UserInfo testUser = settings.users.getUser("test_user");

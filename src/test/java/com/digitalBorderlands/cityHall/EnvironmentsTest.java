@@ -22,7 +22,7 @@ public class EnvironmentsTest {
 		
 		MockClient.withRawResponses(new Expected[] { auth, def });
 		Settings settings = new Settings();
-		Assert.assertEquals(Responses.defaultEnvironment().Value, settings.environments.getDefaultEnviornment());
+		Assert.assertEquals(Responses.defaultEnvironment().value, settings.environments.getDefaultEnviornment());
 	}
 	
 	@Test
@@ -45,7 +45,7 @@ public class EnvironmentsTest {
 	public void getEnvironment() throws Exception {
 		String location = "auth/env/dev/";
 		EnvironmentResponse devResponse = Responses.devEnvironment();
-		MockClient.withFirstCallAfterLogin(devResponse, "GET", location, null);
+		MockClient.withGetCallAfterLogin(devResponse, location, null);
 		
 		Testable getEnvironment = settings -> {
 			EnvironmentInfo dev = settings.environments.get("dev");

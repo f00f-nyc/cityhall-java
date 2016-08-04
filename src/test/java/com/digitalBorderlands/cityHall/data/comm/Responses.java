@@ -23,12 +23,20 @@ public class Responses {
 		return ret;
 	}
 	
-	public static ValueResponse defaultEnvironment() {
+	public static ValueResponse valueResponse(String value) {
 		ValueResponse ret = new ValueResponse();
 		ret.Message = null;
 		ret.Response = "Ok";
-		ret.Value = "dev";
+		ret.value = value;
 		return ret;
+	}
+	
+	public static ValueResponse defaultEnvironment() {
+		return Responses.valueResponse("dev");
+	}
+	
+	public static ValueResponse val1() {
+		return Responses.valueResponse("sample value");
 	}
 	
 	public static <T extends BaseResponse> T responseFromJson(String json, Class<T> type) {
