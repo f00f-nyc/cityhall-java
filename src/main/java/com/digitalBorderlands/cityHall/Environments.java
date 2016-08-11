@@ -34,7 +34,7 @@ public abstract class Environments {
 	
 	public EnvironmentInfo get(String environmentName) throws CityHallException {
 		String location = String.format("auth/env/%s/", environmentName);
-		EnvironmentResponse res = this.parent.get(location, EnvironmentResponse.class);
+		EnvironmentResponse res = this.parent.get(location, null, EnvironmentResponse.class);
 		EnvironmentInfo ret = new EnvironmentInfo();
 		List<EnvironmentRights> list = new ArrayList<EnvironmentRights>(); 
 		for(Entry<String,Integer> entry : res.Users.entrySet()) {

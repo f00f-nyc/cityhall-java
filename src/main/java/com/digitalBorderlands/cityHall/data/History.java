@@ -1,5 +1,5 @@
 package com.digitalBorderlands.cityHall.data;
 
 public class History {
-	public Entry[] Entries;
+	public LogEntry[] entries;
 }

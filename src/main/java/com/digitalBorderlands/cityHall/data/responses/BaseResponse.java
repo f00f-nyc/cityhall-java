@@ -1,6 +1,14 @@
 package com.digitalBorderlands.cityHall.data.responses;
 
+import java.lang.reflect.Type;
+import java.time.Instant;
+
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
 
 public class BaseResponse {
@@ -18,7 +26,17 @@ public class BaseResponse {
 		return this.Response.equals("Ok");
 	}
 
-	private static Gson gson = new Gson();
+	private static Gson gson = BaseResponse.getDeserializer();
+	
+	public static Gson getDeserializer() {
+		return new GsonBuilder()
+				.registerTypeAdapter(Instant.class, new JsonDeserializer<Instant>(){
+					@Override
+					public Instant deserialize(JsonElement json, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+						return Instant.parse(json.getAsJsonPrimitive().getAsString());
+				    }
+				}).create();
+	}
 	
 	public static <T extends BaseResponse> T fromJson(String json, Class<T> type) {
 		try {

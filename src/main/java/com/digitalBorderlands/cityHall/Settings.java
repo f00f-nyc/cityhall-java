@@ -44,9 +44,9 @@ public class Settings {
 		return this.client.post(location, body, type);
 	}
 	
-	<T extends BaseResponse> T get(String location, Class<T> type) throws CityHallException {
+	<T extends BaseResponse> T get(String location, HashMap<String, String> queryParams, Class<T> type) throws CityHallException {
 		this.ensureLoggedIn();
-		return this.client.get(location, null, type);
+		return this.client.get(location, queryParams, type);
 	}
 	
 	<T extends BaseResponse> T delete(String location, Class<T> type) throws CityHallException {

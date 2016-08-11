@@ -4,9 +4,13 @@ import java.util.HashMap;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.digitalBorderlands.cityHall.data.Child;
 import com.digitalBorderlands.cityHall.data.Children;
 import com.digitalBorderlands.cityHall.data.History;
+import com.digitalBorderlands.cityHall.data.LogEntry;
 import com.digitalBorderlands.cityHall.data.Value;
+import com.digitalBorderlands.cityHall.data.responses.ChildrenResponse;
+import com.digitalBorderlands.cityHall.data.responses.HistoryResponse;
 import com.digitalBorderlands.cityHall.data.responses.ValueResponse;
 import com.digitalBorderlands.cityHall.exceptions.CityHallException;
 import com.digitalBorderlands.cityHall.exceptions.NotLoggedInException;
@@ -18,7 +22,7 @@ public abstract class Values {
 	
 	private Settings parent;
 	
-	protected static String SanitizePath(String path) {
+	protected static String sanitizePath(String path) {
 		if (StringUtils.isBlank(path) || path.equals("/")) {
 			return "/";
 		}
@@ -62,19 +66,38 @@ public abstract class Values {
 		if (StringUtils.isBlank(environment)) {
 			environment = this.parent.environments.getDefaultEnviornment();
 		}
-		String location = String.format("env/%s%s", environment, Values.SanitizePath(path));
-		ValueResponse value = this.parent.get(location, ValueResponse.class);
+		String location = String.format("env/%s%s", environment, Values.sanitizePath(path));
+		ValueResponse value = this.parent.get(location, queryParams, ValueResponse.class);
 		return new Value(value.value, value.protect);
 	}
 	
+	public Children getChildren(String path, String environment) throws CityHallException {
+		String sanitizedPath = Values.sanitizePath(path);
+		String location = String.format("env/%s%s", environment, sanitizedPath);
+		HashMap<String, String> queryParams = new HashMap<String, String>();
+		queryParams.put("viewchildren", "true");
+		ChildrenResponse resp = this.parent.get(location, queryParams, ChildrenResponse.class);
+		Children ret = new Children();
+		ret.path = resp.path;
+		ret.children = resp.children.toArray(new Child[resp.children.size()]);
+		return ret;
+	}
+	
 	public History getHistory(String path, String environment, String override) throws CityHallException {
-		throw new NotLoggedInException();
+		String sanitizedPath = Values.sanitizePath(path);
+		String location = String.format("env/%s%s", environment, sanitizedPath);
+		HashMap<String, String> queryParams = new HashMap<String, String>();
+		queryParams.put("viewhistory", "true");		
+		if (override != null) {
+			queryParams.put("override", override);
+		}
+		
+		HistoryResponse resp = this.parent.get(location, queryParams, HistoryResponse.class);
+		History ret = new History();
+		ret.entries = resp.history.toArray(new LogEntry[resp.history.size()]);
+		return ret;
 	}
-	
-	public Children getChildren(String path, String environment, String override) throws CityHallException {
-		throw new NotLoggedInException();
-	}
-	
+		
 	public void set(String path, String environment, String override, String value, boolean protect) throws CityHallException {
 		throw new NotLoggedInException();
 	}

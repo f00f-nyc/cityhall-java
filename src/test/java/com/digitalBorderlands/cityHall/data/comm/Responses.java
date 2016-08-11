@@ -1,13 +1,15 @@
 package com.digitalBorderlands.cityHall.data.comm;
 
 import com.digitalBorderlands.cityHall.data.responses.BaseResponse;
+import com.digitalBorderlands.cityHall.data.responses.ChildrenResponse;
 import com.digitalBorderlands.cityHall.data.responses.EnvironmentResponse;
+import com.digitalBorderlands.cityHall.data.responses.HistoryResponse;
 import com.digitalBorderlands.cityHall.data.responses.UserResponse;
 import com.digitalBorderlands.cityHall.data.responses.ValueResponse;
 import com.google.gson.Gson;
 
 public class Responses {
-	private static Gson gson = new Gson();
+	private static Gson gson = BaseResponse.getDeserializer();
 	
 	public static BaseResponse ok() {
 		BaseResponse ret = new BaseResponse();
@@ -54,6 +56,20 @@ public class Responses {
 		return Responses.responseFromJson(
 				"{\"Response\": \"Ok\", \"Environments\": {\"dev\": 4, \"auto\": 1, \"users\": 1}}",
 				UserResponse.class
+		);
+	}
+	
+	public static ChildrenResponse children() {
+		return Responses.responseFromJson(
+				"{\"Response\": \"Ok\", \"path\":\"/app1/domainA/feature_1/\", \"children\": [ { \"id\": 302, \"name\": \"value1\", \"override\" = \"\", \"path\": \"/app1/domainA/feature_1/value1/\", \"protect\" = false, \"value\" = \"1000\"}, { \"id\": 552, \"name\": \"value1\", \"override\" = \"dev_user\", \"path\": \"/app1/domainA/feature_1/value1/\", \"protect\" = false, \"value\" = \"132\"} ] }",
+				ChildrenResponse.class
+		);
+	}
+	
+	public static HistoryResponse history() {
+		return Responses.responseFromJson(
+				"{\"Response\":\"Ok\", \"History\": [{\"active\":false, \"override\": \"\", \"id\": 12, \"datetime\":\"2016-08-04T15:21:41.821Z\", \"protect\": false, \"name\": \"value1\", \"author\": \"cityhall\"}, {\"active\":true, \"override\": \"\", \"id\": 12, \"datetime\":\"2016-08-05T15:21:41.821Z\", \"protect\": false, \"name\": \"value2\", \"author\": \"cityhall\"}]}",
+				HistoryResponse.class
 		);
 	}
 }

@@ -22,7 +22,7 @@ public abstract class Users {
 	
 	public UserInfo getUser(String user) throws CityHallException {
 		String location = String.format("/auth/user/%s/", user);
-		UserResponse resp = this.parent.get(location, UserResponse.class);
+		UserResponse resp = this.parent.get(location, null, UserResponse.class);
 		UserInfo ret = new UserInfo();
 		List<UserRights> list = new ArrayList<UserRights>();
 		for (Entry<String, Integer> entry: resp.Environments.entrySet()) {

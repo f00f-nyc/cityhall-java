@@ -1,13 +1,13 @@
 package com.digitalBorderlands.cityHall.data;
 
-import java.time.LocalTime;
+import java.time.Instant;
 
-public class Entry {
+public class LogEntry {
     public int id;
     public String name;
-    public String Value;
+    public String value;
     public String author;
-    public LocalTime dateTime;
+    public Instant datetime;
     public Boolean active;
     public Boolean protect;
     public String override;
