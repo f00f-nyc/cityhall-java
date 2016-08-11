@@ -50,10 +50,10 @@ public class EnvironmentsTest {
 		Testable getEnvironment = settings -> {
 			EnvironmentInfo dev = settings.environments.get("dev");
 			
-			Assert.assertEquals(devResponse.Users.size(), dev.rights.length);
-			Object[] devSet = devResponse.Users.entrySet().toArray();
-			String[] keys = devResponse.Users.keySet().toArray(new String[devSet.length]);
-			Integer[] values = devResponse.Users.values().toArray(new Integer[devSet.length]);
+			Assert.assertEquals(devResponse.users.size(), dev.rights.length);
+			Object[] devSet = devResponse.users.entrySet().toArray();
+			String[] keys = devResponse.users.keySet().toArray(new String[devSet.length]);
+			Integer[] values = devResponse.users.values().toArray(new Integer[devSet.length]);
 			
 			for (int i=0; i<devSet.length; i++) {
 				EnvironmentRights envResponse = dev.rights[i];

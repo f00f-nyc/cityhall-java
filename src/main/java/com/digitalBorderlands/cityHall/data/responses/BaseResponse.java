@@ -10,20 +10,24 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.annotations.SerializedName;
 
 public class BaseResponse {
 	public BaseResponse(String response, String message) {
-		this.Response = response;
-		this.Message = message;
+		this.response = response;
+		this.message = message;
 	}
 	
 	public BaseResponse() { }
 	
-	public String Response;
-	public String Message;
+	@SerializedName("Response")
+	public String response;
+	
+	@SerializedName("Message")
+	public String message;
 	
 	public boolean isValid() {
-		return this.Response.equals("Ok");
+		return this.response.equals("Ok");
 	}
 
 	private static Gson gson = BaseResponse.getDeserializer();
@@ -45,8 +49,8 @@ public class BaseResponse {
 			T ret;
 			try {
 				ret = type.newInstance();
-				ret.Response = "Failure";
-				ret.Message = String.format("Syntax exception `%s` from json: `%s`", ex.getMessage(), json);
+				ret.response = "Failure";
+				ret.message = String.format("Syntax exception `%s` from json: `%s`", ex.getMessage(), json);
 				return ret;
 			} catch (InstantiationException | IllegalAccessException e) {
 				// this code is unreachable

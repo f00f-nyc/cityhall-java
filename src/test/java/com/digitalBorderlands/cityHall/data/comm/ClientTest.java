@@ -92,7 +92,7 @@ public class ClientTest extends LocalServerTestBase {
 	
 		Client client = Container.Self.getComponent(Client.class);
 		BaseResponse response = client.get("/some_route", null, BaseResponse.class);
-		Assert.assertEquals("Ok", response.Response);
+		Assert.assertEquals("Ok", response.response);
 		client.close();
 	}
 	
@@ -102,8 +102,8 @@ public class ClientTest extends LocalServerTestBase {
 		String url = this.register(success, HttpStatus.SC_OK, null, "GET");
 		Client client = new Client(url);
 		BaseResponse response = client.get("/some_route", null, BaseResponse.class);
-		Assert.assertEquals("Ok", response.Response);
-		Assert.assertTrue(response.Message == null); 
+		Assert.assertEquals("Ok", response.response);
+		Assert.assertTrue(response.message == null); 
 		client.close();
 	}
 	
@@ -117,8 +117,8 @@ public class ClientTest extends LocalServerTestBase {
 		body.put("key", "value");
 		
 		BaseResponse response = client.post("/", body, BaseResponse.class);
-		Assert.assertEquals("Ok", response.Response);
-		Assert.assertTrue(response.Message == null);
+		Assert.assertEquals("Ok", response.response);
+		Assert.assertTrue(response.message == null);
 		client.close();
 	}
 	
@@ -129,8 +129,8 @@ public class ClientTest extends LocalServerTestBase {
 		Client client = new Client(url);
 		
 		BaseResponse response = client.delete("/", BaseResponse.class);
-		Assert.assertEquals("Ok", response.Response);
-		Assert.assertTrue(response.Message == null);
+		Assert.assertEquals("Ok", response.response);
+		Assert.assertTrue(response.message == null);
 		client.close();
 	}
 	
@@ -144,8 +144,8 @@ public class ClientTest extends LocalServerTestBase {
 		body.put("key", "value");
 		
 		BaseResponse response = client.put("/", body, BaseResponse.class);
-		Assert.assertEquals("Ok", response.Response);
-		Assert.assertTrue(response.Message == null);
+		Assert.assertEquals("Ok", response.response);
+		Assert.assertTrue(response.message == null);
 		client.close();
 	}
 	

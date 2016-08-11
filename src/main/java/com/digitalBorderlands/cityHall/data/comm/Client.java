@@ -88,11 +88,11 @@ public class Client {
 		try
 		{
 			T ret = BaseResponse.fromJson(message, type);
-	        if (ret.Response.equals("Ok")) {
+	        if (ret.response.equals("Ok")) {
 	        	return ret;
 	        }
 	        
-	        throw new ErrorFromCityHallException(ret.Message);
+	        throw new ErrorFromCityHallException(ret.message);
 		} catch (JsonSyntaxException e) {
 	        throw new InvalidResponseException("Failed trying to reach: "+location.toString());
 		} catch (ParseException e) {

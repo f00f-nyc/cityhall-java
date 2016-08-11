@@ -2,10 +2,13 @@ package com.digitalBorderlands.cityHall.data.responses;
 
 import java.util.HashMap;
 
+import com.google.gson.annotations.SerializedName;
+
 public class UserResponse extends BaseResponse {
-	public HashMap<String, Integer> Environments;
+	@SerializedName("Environments")
+	public HashMap<String, Integer> environments;
 
 	public void put(String key, int value) {
-		this.Environments.put(key, new Integer(value));		
+		this.environments.put(key, new Integer(value));		
 	}
 }

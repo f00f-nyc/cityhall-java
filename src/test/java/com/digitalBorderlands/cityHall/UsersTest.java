@@ -24,10 +24,10 @@ public class UsersTest {
 		Testable getUser = settings -> {
 			UserInfo testUser = settings.users.getUser("test_user");
 			
-			Assert.assertEquals(testUserResponse.Environments.size(), testUser.rights.length);
-			Object[] envSet = testUserResponse.Environments.entrySet().toArray();
-			String[] keys = testUserResponse.Environments.keySet().toArray(new String[envSet.length]);
-			Integer[] values = testUserResponse.Environments.values().toArray(new Integer[envSet.length]);
+			Assert.assertEquals(testUserResponse.environments.size(), testUser.rights.length);
+			Object[] envSet = testUserResponse.environments.entrySet().toArray();
+			String[] keys = testUserResponse.environments.keySet().toArray(new String[envSet.length]);
+			Integer[] values = testUserResponse.environments.values().toArray(new Integer[envSet.length]);
 			
 			for (int i=0; i<envSet.length; i++) {
 				UserRights userResponse = testUser.rights[i];

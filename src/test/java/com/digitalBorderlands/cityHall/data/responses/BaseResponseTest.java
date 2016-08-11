@@ -14,8 +14,8 @@ public class BaseResponseTest {
 	public void failureOnBadJson() {
 		BaseResponse res = BaseResponse.fromJson("{ invalid json }", BaseResponse.class);
 		Assert.assertNotNull(res);
-		Assert.assertEquals(res.Response, "Failure");
-		Assert.assertTrue(res.Message.indexOf("{ invalid json") > 0);
+		Assert.assertEquals(res.response, "Failure");
+		Assert.assertTrue(res.message.indexOf("{ invalid json") > 0);
 	}
 	
 	@Test
@@ -28,8 +28,8 @@ public class BaseResponseTest {
 		"}";
 		BaseResponse res = BaseResponse.fromJson(json, BaseResponse.class);
 		Assert.assertNotNull(res);
-		Assert.assertEquals(response, res.Response);
-		Assert.assertEquals(message, res.Message);
+		Assert.assertEquals(response, res.response);
+		Assert.assertEquals(message, res.message);
 	}
 	
 	@Test
@@ -46,8 +46,8 @@ public class BaseResponseTest {
 		"}";
 		ValueResponse res = BaseResponse.fromJson(json, ValueResponse.class);
 		Assert.assertNotNull(res);
-		Assert.assertEquals(response, res.Response);
-		Assert.assertEquals(message, res.Message);
+		Assert.assertEquals(response, res.response);
+		Assert.assertEquals(message, res.message);
 		Assert.assertEquals(value, res.value);
 		Assert.assertEquals(protect, res.protect);
 	}

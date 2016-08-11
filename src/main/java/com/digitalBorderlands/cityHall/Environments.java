@@ -37,7 +37,7 @@ public abstract class Environments {
 		EnvironmentResponse res = this.parent.get(location, null, EnvironmentResponse.class);
 		EnvironmentInfo ret = new EnvironmentInfo();
 		List<EnvironmentRights> list = new ArrayList<EnvironmentRights>(); 
-		for(Entry<String,Integer> entry : res.Users.entrySet()) {
+		for(Entry<String,Integer> entry : res.users.entrySet()) {
 			list.add(new EnvironmentRights(entry.getKey(), entry.getValue()));
 		}
 		ret.rights = list.toArray(new EnvironmentRights[list.size()]);

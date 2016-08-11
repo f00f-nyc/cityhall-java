@@ -2,10 +2,13 @@ package com.digitalBorderlands.cityHall.data.responses;
 
 import java.util.Map;
 
+import com.google.gson.annotations.SerializedName;
+
 public class EnvironmentResponse extends BaseResponse {
-	public Map<String, Integer> Users;
+	@SerializedName("Users")
+	public Map<String, Integer> users;
 
 	public void put(String key, int value) {
-		this.Users.put(key, new Integer(value));		
+		this.users.put(key, new Integer(value));		
 	}
 }

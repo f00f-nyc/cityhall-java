@@ -13,22 +13,22 @@ public class Responses {
 	
 	public static BaseResponse ok() {
 		BaseResponse ret = new BaseResponse();
-		ret.Message = "";
-		ret.Response = "Ok";
+		ret.message = "";
+		ret.response = "Ok";
 		return ret;
 	}
 	
 	public static BaseResponse notOk() {
 		BaseResponse ret = new BaseResponse();
-		ret.Message = "Some failure message";
-		ret.Response = "Failure";
+		ret.message = "Some failure message";
+		ret.response = "Failure";
 		return ret;
 	}
 	
 	public static ValueResponse valueResponse(String value) {
 		ValueResponse ret = new ValueResponse();
-		ret.Message = null;
-		ret.Response = "Ok";
+		ret.message = null;
+		ret.response = "Ok";
 		ret.value = value;
 		return ret;
 	}

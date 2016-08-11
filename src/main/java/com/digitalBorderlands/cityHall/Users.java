@@ -25,7 +25,7 @@ public abstract class Users {
 		UserResponse resp = this.parent.get(location, null, UserResponse.class);
 		UserInfo ret = new UserInfo();
 		List<UserRights> list = new ArrayList<UserRights>();
-		for (Entry<String, Integer> entry: resp.Environments.entrySet()) {
+		for (Entry<String, Integer> entry: resp.environments.entrySet()) {
 			list.add(new UserRights(entry.getKey(), entry.getValue()));
 		}
 		ret.rights = list.toArray(new UserRights[list.size()]);
