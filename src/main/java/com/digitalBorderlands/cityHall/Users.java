@@ -40,7 +40,7 @@ public abstract class Users {
 		String location = String.format("auth/user/%s/", user);
 		HashMap<String,String> body = new HashMap<String, String>();
 		body.put("passhash", Password.hash(password));
-		this.parent.post(location, body, BaseResponse.class);
+		this.parent.post(location, body, null, BaseResponse.class);
 	}
 	
 	public void deleteUser(String user) throws CityHallException {
@@ -54,6 +54,6 @@ public abstract class Users {
 		body.put("user", user);
 		body.put("rights", Integer.toString(rights.intValue()));
 		
-		this.parent.post("auth/grant/", body,  BaseResponse.class);
+		this.parent.post("auth/grant/", body, null, BaseResponse.class);
 	}
 }

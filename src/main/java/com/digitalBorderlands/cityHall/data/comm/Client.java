@@ -1,7 +1,9 @@
 package com.digitalBorderlands.cityHall.data.comm;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.http.HttpHost;
@@ -68,6 +70,23 @@ public class Client {
     private interface serverCall {
     	public HttpResponse run() throws Exception;
     }
+	
+	private static URI uriFromParts(String location, Map<String, String> queryParams) throws CityHallException {
+		URIBuilder builder;
+		try {
+			builder = new URIBuilder(location);
+				
+			if (queryParams != null) {
+				for (Entry<String, String> entry: queryParams.entrySet()) {
+					builder.addParameter(entry.getKey(), entry.getValue());
+				}
+			}
+			
+			return builder.build();
+		} catch (URISyntaxException e) {
+			throw new InvalidRequestException("Error attempting to build URI to reach", e);
+		}
+	}
     
     private <T extends BaseResponse> T run(String location, serverCall call, Class<T> type) throws CityHallException {
     	int status = -1;
@@ -100,9 +119,13 @@ public class Client {
 		}
     }
     
-	public <T extends BaseResponse> T post(String location, HashMap<String,String> body, Class<T> type) throws CityHallException {
+	public <T extends BaseResponse> T post(String location, Map<String,String> body, Class<T> type) throws CityHallException {
+			return this.post(location, body, null, type);
+	}
+	
+	public <T extends BaseResponse> T post(String location, Map<String, String> body, Map<String, String> queryParams, Class<T> type) throws CityHallException {
 		serverCall call = () -> {
-			HttpPost httpPost = new HttpPost(location);
+			HttpPost httpPost = new HttpPost(Client.uriFromParts(location, queryParams));
 			String bodyJson = Client.gson.toJson(body, body.getClass());
 			httpPost.setEntity(new StringEntity(bodyJson));
 			httpPost.setHeader("Accept", "application/json");
@@ -110,21 +133,12 @@ public class Client {
 			return this.client.execute(this.target, httpPost, this.context);
 		};
 		
-		return this.run(location, call, type);	
+		return this.run(location, call, type);
 	}
 
-	public <T extends BaseResponse> T get(String location, HashMap<String, String> queryParams, Class<T> type) throws CityHallException {
+	public <T extends BaseResponse> T get(String location, Map<String, String> queryParams, Class<T> type) throws CityHallException {
 		serverCall call = () -> {
-			HttpGet httpGet;
-			if (queryParams == null) {
-				httpGet = new HttpGet(location);
-			} else {
-				URIBuilder builder = new URIBuilder(location);
-				for (Entry<String, String> entry : queryParams.entrySet()) {
-					builder.addParameter(entry.getKey(), entry.getValue());
-				}
-				httpGet = new HttpGet(builder.build());
-			}
+			HttpGet httpGet = new HttpGet(Client.uriFromParts(location, queryParams));
 			httpGet.setHeader("Accept", "application/json");
 			return this.client.execute(this.target, httpGet, this.context);
 		};
@@ -142,7 +156,7 @@ public class Client {
 	    return this.run(location, call, type);
 	}
 	
-	public <T extends BaseResponse> T put(String location, HashMap<String, String> body, Class<T> type) throws CityHallException {
+	public <T extends BaseResponse> T put(String location, Map<String, String> body, Class<T> type) throws CityHallException {
 		serverCall call = () -> {
 			HttpPut httpPut = new HttpPut(location);
 			String bodyJson = Client.gson.toJson(body, body.getClass());

@@ -1,6 +1,8 @@
 package com.digitalBorderlands.cityHall.data.comm;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 
 import org.apache.http.HttpEntity;
@@ -10,6 +12,8 @@ import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.localserver.LocalServerTestBase;
 import org.apache.http.protocol.HttpContext;
@@ -29,22 +33,25 @@ public class ClientTest extends LocalServerTestBase {
 	
 	public class SimpleService implements HttpRequestHandler {
 		public SimpleService(String response, int statusCode) {
-			this(response, statusCode, null, null);
+			this(response, statusCode, null, null, null);
 		}
 		
-		public SimpleService(String response, int statusCode, String expectedBody, String method) {
+		public SimpleService(String response, int statusCode, String expectedBody, HashMap<String, String> expectedQueryParams, String method) {
 			super();
 			this.response = response;
 			this.statusCode = statusCode;
 			this.expectedBody = expectedBody;
 			this.method = method;
+			this.expectedQueryParams = expectedQueryParams;
 		}
 		
 		private String response;
 		private int statusCode;
 		private String expectedBody;
 		private String method;
+		private HashMap<String, String> expectedQueryParams;
 
+		
 		@Override
 		public void handle(
 				final HttpRequest request,
@@ -62,6 +69,19 @@ public class ClientTest extends LocalServerTestBase {
 			    String actualMethod = request.getRequestLine().getMethod();
 				Assert.assertEquals(this.method.toLowerCase(), actualMethod.toLowerCase());
 			}
+			 
+			if (this.expectedQueryParams != null) {
+				try {
+					URI uri = new URI(request.getRequestLine().getUri());
+					for (NameValuePair pair : URLEncodedUtils.parse(uri, "UTF-8")) {
+						Assert.assertTrue(this.expectedQueryParams.containsKey(pair.getName()));
+						Assert.assertEquals(pair.getValue(), this.expectedQueryParams.get(pair.getName()));
+					}
+				} catch (URISyntaxException e) {
+					Assert.assertTrue("Caught an error while trying to check query params: " + e.getMessage(), false);
+					e.printStackTrace();
+				}
+			}
 			
 			final StringEntity entity = new StringEntity(this.response);
 			response.setEntity(entity);
@@ -75,8 +95,8 @@ public class ClientTest extends LocalServerTestBase {
 		return String.format("http://localhost:%d", target.getPort());
 	}
 	
-	public String register(String message, int statusCode, String expectedBody, String method) throws Exception {
-		this.serverBootstrap.registerHandler("*", new SimpleService(message, statusCode, expectedBody, method));
+	public String register(String message, int statusCode, String expectedBody, HashMap<String,String> queryParams, String method) throws Exception {
+		this.serverBootstrap.registerHandler("*", new SimpleService(message, statusCode, expectedBody, queryParams, method));
 		this.clientBuilder.build(); // is this needed?
 		HttpHost target = this.start();
 		return String.format("http://localhost:%d", target.getPort());
@@ -85,7 +105,7 @@ public class ClientTest extends LocalServerTestBase {
 	@Test
 	public void getClientUsingContainer() throws Exception {
 		String success = "{\"Response\":\"Ok\"}";
-		String url = this.register(success, HttpStatus.SC_OK, null, "GET");
+		String url = this.register(success, HttpStatus.SC_OK, null, null, "GET");
 		
 		Container.Self.removeComponent(Client.class);
 		Container.Self.addComponent(Client.class, Client.class, new ConstantParameter(url));
@@ -99,7 +119,7 @@ public class ClientTest extends LocalServerTestBase {
 	@Test
 	public void getReturnsSuccess() throws Exception {
 		String success = "{\"Response\":\"Ok\"}";
-		String url = this.register(success, HttpStatus.SC_OK, null, "GET");
+		String url = this.register(success, HttpStatus.SC_OK, null, null, "GET");
 		Client client = new Client(url);
 		BaseResponse response = client.get("/some_route", null, BaseResponse.class);
 		Assert.assertEquals("Ok", response.response);
@@ -108,9 +128,19 @@ public class ClientTest extends LocalServerTestBase {
 	}
 	
 	@Test
+	public void getUsingQueryParams() throws Exception {
+		HashMap<String, String> queryParams = new HashMap<String, String>();
+		queryParams.put("override", "cityhall");
+		String url = this.register(Responses.ok().toJson(), HttpStatus.SC_OK, null, queryParams, "GET");
+		Client client = new Client(url);
+		client.get("/some_route", queryParams, BaseResponse.class);
+		client.close();
+	}
+	
+	@Test
 	public void postReturnsSuccess() throws Exception {
 		String success = "{\"Response\":\"Ok\"}";
-		String url = this.register(success, HttpStatus.SC_OK, "{\"key\":\"value\"}", "POST");
+		String url = this.register(success, HttpStatus.SC_OK, "{\"key\":\"value\"}", null, "POST");
 		Client client = new Client(url);
 		
 		HashMap<String, String> body = new HashMap<String, String>();
@@ -123,9 +153,21 @@ public class ClientTest extends LocalServerTestBase {
 	}
 	
 	@Test
+	public void postUsingQueryParams() throws Exception {
+		HashMap<String, String> queryParams = new HashMap<String, String>();
+		queryParams.put("override", "cityhall");
+		HashMap<String, String> body = new HashMap<String, String>();
+		body.put("key", "value");
+		String url = this.register(Responses.ok().toJson(), HttpStatus.SC_OK, "{\"key\":\"value\"}", queryParams, "POST");
+		Client client = new Client(url);
+		client.post("/some_route", body, queryParams, BaseResponse.class);
+		client.close();
+	}
+	
+	@Test
 	public void deleteReturnsSuccess() throws Exception {
 		String success = "{\"Response\":\"Ok\"}";
-		String url = this.register(success, HttpStatus.SC_OK, null, "DELETE");
+		String url = this.register(success, HttpStatus.SC_OK, null, null, "DELETE");
 		Client client = new Client(url);
 		
 		BaseResponse response = client.delete("/", BaseResponse.class);
@@ -137,7 +179,7 @@ public class ClientTest extends LocalServerTestBase {
 	@Test
 	public void putReturnsSuccess() throws Exception {
 		String success = "{\"Response\":\"Ok\"}";
-		String url = this.register(success, HttpStatus.SC_OK, "{\"key\":\"value\"}", "PUT");
+		String url = this.register(success, HttpStatus.SC_OK, "{\"key\":\"value\"}", null, "PUT");
 		Client client = new Client(url);
 		
 		HashMap<String, String> body = new HashMap<String, String>();
@@ -153,7 +195,7 @@ public class ClientTest extends LocalServerTestBase {
 	public void getReturnsFailure() throws Exception {
 		String message = "Some failure message";
 		String failure = "{\"Response\":\"Failure\",\"Message\":\""+message+"\"}";
-		String url = this.register(failure, HttpStatus.SC_OK, null, "GET");
+		String url = this.register(failure, HttpStatus.SC_OK, null, null, "GET");
 		Client client = new Client(url);
 		try {
 			client.get("/some_route", null, BaseResponse.class);
@@ -168,7 +210,7 @@ public class ClientTest extends LocalServerTestBase {
 	public void deleteReturnsFailure() throws Exception {
 		String message = "Some failure message";
 		String failure = "{\"Response\":\"Failure\",\"Message\":\""+message+"\"}";
-		String url = this.register(failure, HttpStatus.SC_OK, null, "DELETE");
+		String url = this.register(failure, HttpStatus.SC_OK, null, null, "DELETE");
 		Client client = new Client(url);
 		try {
 			client.delete("/some_route", BaseResponse.class);
@@ -183,7 +225,7 @@ public class ClientTest extends LocalServerTestBase {
 	public void postReturnsFailure() throws Exception {
 		String message = "Some failure message";
 		String failure = "{\"Response\":\"Failure\",\"Message\":\""+message+"\"}";
-		String url = this.register(failure, HttpStatus.SC_OK, null, "POST");
+		String url = this.register(failure, HttpStatus.SC_OK, null, null, "POST");
 		Client client = new Client(url);
 		try {
 			client.post("/some_route", new HashMap<String,String>(), BaseResponse.class);
@@ -198,7 +240,7 @@ public class ClientTest extends LocalServerTestBase {
 	public void putReturnsFailure() throws Exception {
 		String message = "Some failure message";
 		String failure = "{\"Response\":\"Failure\",\"Message\":\""+message+"\"}";
-		String url = this.register(failure, HttpStatus.SC_OK, null, "PUT");
+		String url = this.register(failure, HttpStatus.SC_OK, null, null, "PUT");
 		Client client = new Client(url);
 		try {
 			client.put("/some_route", new HashMap<String,String>(), BaseResponse.class);
@@ -211,7 +253,7 @@ public class ClientTest extends LocalServerTestBase {
 
 	@Test(expected=InvalidRequestException.class)
 	public void getReturns507() throws Exception {
-		String url = this.register("Some random error mesage", HttpStatus.SC_INSUFFICIENT_STORAGE, null, "GET");
+		String url = this.register("Some random error mesage", HttpStatus.SC_INSUFFICIENT_STORAGE, null, null, "GET");
 		Client client = new Client(url);
 		try {
 			client.get("/some_route", null, BaseResponse.class);
@@ -223,7 +265,7 @@ public class ClientTest extends LocalServerTestBase {
 
 	@Test(expected=InvalidRequestException.class)
 	public void deleteReturns507() throws Exception {
-		String url = this.register("Some random error mesage", HttpStatus.SC_INSUFFICIENT_STORAGE, null, "DELETE");
+		String url = this.register("Some random error mesage", HttpStatus.SC_INSUFFICIENT_STORAGE, null, null, "DELETE");
 		Client client = new Client(url);
 		try {
 			client.delete("/some_route", BaseResponse.class);
@@ -235,7 +277,7 @@ public class ClientTest extends LocalServerTestBase {
 	
 	@Test(expected=InvalidRequestException.class)
 	public void postReturns507() throws Exception {
-		String url = this.register("Some random error mesage", HttpStatus.SC_INSUFFICIENT_STORAGE, null, "POST");
+		String url = this.register("Some random error mesage", HttpStatus.SC_INSUFFICIENT_STORAGE, null, null, "POST");
 		Client client = new Client(url);
 		try {
 			client.post("/some_route", new HashMap<String, String>(), BaseResponse.class);
@@ -247,7 +289,7 @@ public class ClientTest extends LocalServerTestBase {
 	
 	@Test(expected=InvalidRequestException.class)
 	public void putReturns507() throws Exception {
-		String url = this.register("Some random error mesage", HttpStatus.SC_INSUFFICIENT_STORAGE, null, "PUT");
+		String url = this.register("Some random error mesage", HttpStatus.SC_INSUFFICIENT_STORAGE, null, null, "PUT");
 		Client client = new Client(url);
 		try {
 			client.put("/some_route", new HashMap<String, String>(), BaseResponse.class);

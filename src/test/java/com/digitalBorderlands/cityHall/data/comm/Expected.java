@@ -1,6 +1,7 @@
 package com.digitalBorderlands.cityHall.data.comm;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.junit.Assert;
@@ -38,41 +39,62 @@ public class Expected {
 		this.QueryParams = queryParams;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public <T extends BaseResponse> T check(String method, String location, HashMap<String, String> body, Class<T> type) {
+	private void checkMethod(String method) {
 		if (this.Method != null) {
 			Assert.assertEquals(method.toUpperCase(), this.Method.toUpperCase());
 		}
-		
+	}
+	
+	private void checkLocation(String location) {
 		if (this.Location != null) {
 			Assert.assertEquals(location, this.Location);
 		}
-		
-		if ((body != null) && (this.Body != null)) {
-			Assert.assertEquals(body.size(), this.Body.size());
+	}
+	
+	private void checkMap(Map<String, String> expected, Map<String, String> actual) {
+		if ((expected != null) && (actual != null)) {
+			Assert.assertEquals(expected.size(), actual.size());
 			
-			for(Entry<String, String> entry : this.Body.entrySet()) {
-				Assert.assertTrue(body.containsKey(entry.getKey()));
-				Assert.assertEquals(entry.getValue(), body.get(entry.getKey()));
+			for(Entry<String, String> entry : expected.entrySet()) {
+				Assert.assertTrue(actual.containsKey(entry.getKey()));
+				Assert.assertEquals(entry.getValue(), actual.get(entry.getKey()));
 			}
 		}
-
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T extends BaseResponse> T checkType(Class<T> type) {
 		Assert.assertEquals(type, this.Response.getClass());
 		return (T)this.Response;
 	}
 	
-	public <T extends BaseResponse> T checkGet(String location, HashMap<String, String> queryParams, Class<T> type) {
-		T ret = this.check("GET", location,  null, type);
-		
-		if ((queryParams != null) && (this.QueryParams != null)) {
-			Assert.assertEquals(queryParams.size(), this.QueryParams.size());
-			
-			for (Entry<String, String> entry : this.QueryParams.entrySet()) {
-				Assert.assertTrue(queryParams.containsKey(entry.getKey()));
-				Assert.assertEquals(entry.getValue(), queryParams.get(entry.getKey()));
-			}
-		}
-		
-		return ret;
+	public <T extends BaseResponse> T checkPost(String location, Map<String, String> body, Map<String, String> queryParams, Class<T> type) {
+		this.checkMethod("POST");
+		this.checkLocation(location);
+		this.checkMap(this.Body, body);
+		this.checkMap(this.QueryParams, queryParams);
+		return this.checkType(type);
+	}
+	
+	public <T extends BaseResponse> T checkGet(String location, Map<String, String> queryParams, Class<T> type) {
+		this.checkMethod("GET");
+		this.checkLocation(location);
+		this.checkMap(this.QueryParams, queryParams);
+		return this.checkType(type);
+	}
+	
+	public <T extends BaseResponse> T checkDelete(String location, Map<String, String> queryParams, Class<T> type) {
+		this.checkMethod("DELETE");
+		this.checkLocation(location);
+		this.checkMap(this.QueryParams, queryParams);
+		return this.checkType(type);
+	}
+	
+	public <T extends BaseResponse> T checkPut(String location, Map<String, String> body, Map<String, String> queryParams, Class<T> type) {
+		this.checkMethod("PUT");
+		this.checkLocation(location);
+		this.checkMap(this.Body, body);
+		this.checkMap(this.QueryParams, queryParams);
+		return this.checkType(type);
 	}
 }

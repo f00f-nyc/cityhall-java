@@ -3,6 +3,7 @@ package com.digitalBorderlands.cityHall;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -39,12 +40,12 @@ public class Settings {
 		}
 	}
 	
-	<T extends BaseResponse> T post(String location, HashMap<String,String> body, Class<T> type) throws CityHallException {
+	<T extends BaseResponse> T post(String location, Map<String,String> body, Map<String, String> queryParams, Class<T> type) throws CityHallException {
 		this.ensureLoggedIn();
-		return this.client.post(location, body, type);
+		return this.client.post(location, body, queryParams, type);
 	}
 	
-	<T extends BaseResponse> T get(String location, HashMap<String, String> queryParams, Class<T> type) throws CityHallException {
+	<T extends BaseResponse> T get(String location, Map<String, String> queryParams, Class<T> type) throws CityHallException {
 		this.ensureLoggedIn();
 		return this.client.get(location, queryParams, type);
 	}

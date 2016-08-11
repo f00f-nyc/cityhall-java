@@ -1,6 +1,7 @@
 package com.digitalBorderlands.cityHall.data.comm;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Assert;
 
@@ -30,23 +31,23 @@ public class MockClient {
 		}
 		
 		@Override
-		public <T extends BaseResponse> T get(String location, HashMap<String,String> queryParams, Class<T> type) throws CityHallException {
+		public <T extends BaseResponse> T get(String location, Map<String,String> queryParams, Class<T> type) throws CityHallException {
 			return this.nextResponse().checkGet(location, queryParams, type);
 		}
 		
 		@Override
-		public <T extends BaseResponse> T post(String location, HashMap<String, String> body, Class<T> type) throws CityHallException {
-			return this.nextResponse().check("POST", location, body, type);
+		public <T extends BaseResponse> T post(String location, Map<String, String> body, Map<String, String> queryParams, Class<T> type) throws CityHallException {
+			return this.nextResponse().checkPost(location, body, queryParams, type);
 		}
 		
 		@Override
 		public <T extends BaseResponse> T delete(String location, Class<T> type) throws CityHallException {
-			return this.nextResponse().check("DELETE", location, null, type);
+			return this.nextResponse().checkDelete(location, null, type);
 		}
 		
 		@Override
-		public <T extends BaseResponse> T put(String location, HashMap<String, String> body, Class<T> type) throws CityHallException {
-			return this.nextResponse().check("PUT", location, body, type);
+		public <T extends BaseResponse> T put(String location, Map<String, String> body, Class<T> type) throws CityHallException {
+			return this.nextResponse().checkPut(location, body, null, type);
 		}
 	}
 	

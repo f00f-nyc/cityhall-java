@@ -28,7 +28,7 @@ public abstract class Environments {
 		String location = String.format("auth/user/%s/default/", this.parent.getUser());
 		HashMap<String, String> body = new HashMap<String, String>();
 		body.put("env", defaultEnvironment);
-		this.parent.post(location, body, BaseResponse.class);
+		this.parent.post(location, body, null, BaseResponse.class);
 		this.defaultEnvironment = defaultEnvironment;
 	}
 	
@@ -46,6 +46,6 @@ public abstract class Environments {
 	
 	public void create(String environmentName) throws CityHallException {
 		String location = String.format("auth/env/%s/", environmentName);
-		this.parent.post(location, null, BaseResponse.class);
+		this.parent.post(location, null, null, BaseResponse.class);
 	}
 }
