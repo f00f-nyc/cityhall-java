@@ -70,7 +70,7 @@ public class MockClient {
 		return client;
 	}
 	
-	private static Client withFirstCallAfterLogin(Expected underTest) {
+	public static Client withFirstCallAfterLogin(Expected underTest) {
 		Expected login = new Expected(Responses.ok(), "POST", "auth/", null);
 		Expected defaultEnvironment = new Expected(Responses.defaultEnvironment(), null, null);
 		Client client = new ClientWithResponses(new Expected[] { login, defaultEnvironment, underTest });

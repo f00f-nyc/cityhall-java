@@ -10,6 +10,8 @@ import com.digitalBorderlands.cityHall.data.Children;
 import com.digitalBorderlands.cityHall.data.History;
 import com.digitalBorderlands.cityHall.data.LogEntry;
 import com.digitalBorderlands.cityHall.data.Value;
+import com.digitalBorderlands.cityHall.data.comm.Client;
+import com.digitalBorderlands.cityHall.data.comm.Expected;
 import com.digitalBorderlands.cityHall.data.comm.MockClient;
 import com.digitalBorderlands.cityHall.data.comm.Responses;
 import com.digitalBorderlands.cityHall.data.responses.ChildrenResponse;
@@ -121,5 +123,65 @@ public class ValuesTest {
 		}
 		
 		ErrorTester.logOutWorks(settings -> settings.values.getHistory("app1", "env", null));
+	}
+
+	private static Client mockSetWith(String value, Boolean protect, String override) {
+		HashMap<String, String> body = null;
+		
+		if ((value != null) && (protect != null)) {
+			body = new HashMap<String, String>();
+			if (value != null) {
+				body.put("value", value);
+			}
+			if (protect != null) {
+				body.put("protect", protect.toString());
+			}
+		}
+
+		HashMap<String, String> queryParams = null;
+		if (override != null) {
+			queryParams = new HashMap<String, String>();
+			queryParams.put("override", override);
+		}
+		
+		Expected expected = new Expected(Responses.ok(), "POST", "env/qa/some_value/", body, queryParams);
+		return MockClient.withFirstCallAfterLogin(expected);
+	}
+	
+	public void set() throws Exception {
+		ValuesTest.mockSetWith(null, null, null);
+		new Settings().values.set("some_value", "qa", null, null);
+		
+		ErrorTester.logOutWorks(settings -> settings.values.set("path", "qa", null, "value"));
+	}
+	
+	public void setValue() throws Exception {
+		ValuesTest.mockSetWith("a value", null, null);
+		new Settings().values.set("some_value", "qa", null, "a value");
+	}
+	
+	public void setValueOverride() throws Exception {
+		ValuesTest.mockSetWith("a value", null, "cityhall");
+		new Settings().values.set("some_value", "qa", "cityhall", "a value");
+	}
+	
+	public void setProtect() throws Exception {
+		ValuesTest.mockSetWith(null, true, null);
+		new Settings().values.set("some_value", "qa", null, true);
+	}
+	
+	public void setProtectOverride() throws Exception {
+		ValuesTest.mockSetWith(null, true, "cityhall");
+		new Settings().values.set("some_value", "qa", "cityhall", true);
+	}
+	
+	public void setValueProtect() throws Exception {
+		ValuesTest.mockSetWith("a value", true, null);
+		new Settings().values.set("some_value", "qa", null, "a value", true);
+	}
+	
+	public void setValueProtectOverride() throws Exception {
+		ValuesTest.mockSetWith("a value", true, "cityhall");
+		new Settings().values.set("some_value", "qa", "cityhall", "a value", true);
 	}
 }

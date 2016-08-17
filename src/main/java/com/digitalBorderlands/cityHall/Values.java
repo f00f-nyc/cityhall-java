@@ -9,6 +9,7 @@ import com.digitalBorderlands.cityHall.data.Children;
 import com.digitalBorderlands.cityHall.data.History;
 import com.digitalBorderlands.cityHall.data.LogEntry;
 import com.digitalBorderlands.cityHall.data.Value;
+import com.digitalBorderlands.cityHall.data.responses.BaseResponse;
 import com.digitalBorderlands.cityHall.data.responses.ChildrenResponse;
 import com.digitalBorderlands.cityHall.data.responses.HistoryResponse;
 import com.digitalBorderlands.cityHall.data.responses.ValueResponse;
@@ -98,8 +99,21 @@ public abstract class Values {
 		return ret;
 	}
 		
-	public void set(String path, String environment, String override, String value, boolean protect) throws CityHallException {
-		throw new NotLoggedInException();
+	public void set(String path, String environment, String override, String value, Boolean protect) throws CityHallException {
+		HashMap<String, String> body = new HashMap<String, String>();
+		if (value != null) {
+			body.put("value", value);
+		}
+		if (protect != null) {
+			body.put("protect", protect.toString());
+		}
+		HashMap<String, String> queryParams = null;
+		if (override != null) {
+			queryParams = new HashMap<String, String>();
+			queryParams.put("override", override);
+		}
+		String location = String.format("env/%s%s", environment, Values.sanitizePath(path));		
+		this.parent.post(location, body, queryParams, BaseResponse.class);
 	}
 	
 	public void set(String path, String environment, String override, String value) throws CityHallException {
