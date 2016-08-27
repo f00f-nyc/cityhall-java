@@ -15,7 +15,6 @@ import com.digitalBorderlands.cityHall.data.responses.ChildrenResponse;
 import com.digitalBorderlands.cityHall.data.responses.HistoryResponse;
 import com.digitalBorderlands.cityHall.data.responses.ValueResponse;
 import com.digitalBorderlands.cityHall.exceptions.CityHallException;
-import com.digitalBorderlands.cityHall.exceptions.NotLoggedInException;
 
 public abstract class Values {
 	protected Values(Settings parent) {
@@ -99,14 +98,19 @@ public abstract class Values {
 	}
 	
 	public void set(String path, String environment, String override, String value) throws CityHallException {
-		throw new NotLoggedInException();
+		this.set(path, environment, override, value, null);
 	}
 	
 	public void set(String path, String environment, String override, boolean protect) throws CityHallException {
-		throw new NotLoggedInException();
+		this.set(path, environment, override, null, protect);
 	}
 
-	public void delete(String path, String environment, String override) throws CityHallException {
-		throw new NotLoggedInException();
+	public void delete(String path, String environment, String override) throws CityHallException {		
+		String overrideSend = StringUtils.isEmpty(override) ? "" : override;
+		HashMap<String, String> queryParams = new HashMap<String, String>();
+		queryParams.put("override", overrideSend);
+		
+		String location = String.format("env/%s%s", environment, Client.sanitizePath(path));		
+		this.parent.delete(location, BaseResponse.class);
 	}
 }

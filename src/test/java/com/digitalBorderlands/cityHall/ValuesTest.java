@@ -148,6 +148,7 @@ public class ValuesTest {
 		return MockClient.withFirstCallAfterLogin(expected);
 	}
 	
+	@Test
 	public void set() throws Exception {
 		ValuesTest.mockSetWith(null, null, null);
 		new Settings().values.set("some_value", "qa", null, null);
@@ -155,33 +156,53 @@ public class ValuesTest {
 		ErrorTester.logOutWorks(settings -> settings.values.set("path", "qa", null, "value"));
 	}
 	
+	@Test
 	public void setValue() throws Exception {
 		ValuesTest.mockSetWith("a value", null, null);
 		new Settings().values.set("some_value", "qa", null, "a value");
 	}
 	
+	@Test
 	public void setValueOverride() throws Exception {
 		ValuesTest.mockSetWith("a value", null, "cityhall");
 		new Settings().values.set("some_value", "qa", "cityhall", "a value");
 	}
 	
+	@Test
 	public void setProtect() throws Exception {
 		ValuesTest.mockSetWith(null, true, null);
 		new Settings().values.set("some_value", "qa", null, true);
 	}
 	
+	@Test
 	public void setProtectOverride() throws Exception {
 		ValuesTest.mockSetWith(null, true, "cityhall");
 		new Settings().values.set("some_value", "qa", "cityhall", true);
 	}
 	
+	@Test
 	public void setValueProtect() throws Exception {
 		ValuesTest.mockSetWith("a value", true, null);
 		new Settings().values.set("some_value", "qa", null, "a value", true);
 	}
 	
+	@Test
 	public void setValueProtectOverride() throws Exception {
 		ValuesTest.mockSetWith("a value", true, "cityhall");
 		new Settings().values.set("some_value", "qa", "cityhall", "a value", true);
+	}
+	
+	@Test
+	public void delete() throws Exception {
+		HashMap<String, String> queryParams = new HashMap<String, String>();
+		queryParams.put("override", "");		
+		Expected expected = new Expected(Responses.ok(), "DELETE", "env/qa/some_value/", null, queryParams);
+		MockClient.withFirstCallAfterLogin(expected);
+		new Settings().values.delete("some_value", "qa", null);
+		
+		queryParams.put("override", "cityhall");
+		expected = new Expected(Responses.ok(), "DELETE", "env/uat/app/value/", null, queryParams);
+		MockClient.withFirstCallAfterLogin(expected);
+		new Settings().values.delete("/app/value/", "uat", "cityhall");
 	}
 }

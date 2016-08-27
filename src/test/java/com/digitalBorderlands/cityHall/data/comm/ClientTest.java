@@ -306,5 +306,6 @@ public class ClientTest extends LocalServerTestBase {
 		url = url.substring(7);	//get rid of the 'http://'
 		client = new Client(url+"/api/");
 		client.get("some/path", null, BaseResponse.class);
+		client.close();
 	}
 }
