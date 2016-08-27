@@ -20,8 +20,8 @@ USAGE
 The intention is to use the built-in City Hall web site for actual settings management, and then use this library for consuming those settings, in an application. As such, there is really only one command to be familiar with:
 
 ```Java
-	Settings settings = new Settings();
-	String value = settings.get("/app/some_value");
+	Settings cityhall = new Settings();
+	String value = cityhall.get("/app/some_value");
 ```
 
 LICENSE

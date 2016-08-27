@@ -144,7 +144,15 @@ public class Settings {
 		body.put("passhash", Password.hash(password));
 		this.put(location, body, BaseResponse.class);		
 	}
-
+	
+	/*
+	 * This function is here since it's expected to be the most used. 
+	 * All other gets should route through values property
+	 */
+	public String get(String path) throws CityHallException {
+		return this.values.get(path);
+	}
+	
     void ensureLoggedIn() throws CityHallException {
     	if (!this.isLoggedIn()) {
     		throw new NotLoggedInException();
