@@ -9,6 +9,7 @@ import com.digitalBorderlands.cityHall.data.Children;
 import com.digitalBorderlands.cityHall.data.History;
 import com.digitalBorderlands.cityHall.data.LogEntry;
 import com.digitalBorderlands.cityHall.data.Value;
+import com.digitalBorderlands.cityHall.data.comm.Client;
 import com.digitalBorderlands.cityHall.data.responses.BaseResponse;
 import com.digitalBorderlands.cityHall.data.responses.ChildrenResponse;
 import com.digitalBorderlands.cityHall.data.responses.HistoryResponse;
@@ -22,25 +23,6 @@ public abstract class Values {
 	}
 	
 	private Settings parent;
-	
-	protected static String sanitizePath(String path) {
-		if (StringUtils.isBlank(path) || path.equals("/")) {
-			return "/";
-		}
-		
-		char first = path.charAt(0);
-		char last = path.charAt(path.length()-1);
-		
-		if ((first == '/') && (last == '/')) {
-			return path;
-		} else if (first == '/') {
-			return String.format("%s/", path);
-		} else if (last == '/') {
-			return String.format("/%s", path);	
-		}
-		
-		return String.format("/%s/", path);
-	}
 	
 	public String get(String path) throws CityHallException {
 		return this.get(path, null, null);
@@ -67,13 +49,13 @@ public abstract class Values {
 		if (StringUtils.isBlank(environment)) {
 			environment = this.parent.environments.getDefaultEnviornment();
 		}
-		String location = String.format("env/%s%s", environment, Values.sanitizePath(path));
+		String location = String.format("env/%s%s", environment, Client.sanitizePath(path));
 		ValueResponse value = this.parent.get(location, queryParams, ValueResponse.class);
 		return new Value(value.value, value.protect);
 	}
 	
 	public Children getChildren(String path, String environment) throws CityHallException {
-		String sanitizedPath = Values.sanitizePath(path);
+		String sanitizedPath = Client.sanitizePath(path);
 		String location = String.format("env/%s%s", environment, sanitizedPath);
 		HashMap<String, String> queryParams = new HashMap<String, String>();
 		queryParams.put("viewchildren", "true");
@@ -85,7 +67,7 @@ public abstract class Values {
 	}
 	
 	public History getHistory(String path, String environment, String override) throws CityHallException {
-		String sanitizedPath = Values.sanitizePath(path);
+		String sanitizedPath = Client.sanitizePath(path);
 		String location = String.format("env/%s%s", environment, sanitizedPath);
 		HashMap<String, String> queryParams = new HashMap<String, String>();
 		queryParams.put("viewhistory", "true");		
@@ -112,7 +94,7 @@ public abstract class Values {
 			queryParams = new HashMap<String, String>();
 			queryParams.put("override", override);
 		}
-		String location = String.format("env/%s%s", environment, Values.sanitizePath(path));		
+		String location = String.format("env/%s%s", environment, Client.sanitizePath(path));		
 		this.parent.post(location, body, queryParams, BaseResponse.class);
 	}
 	

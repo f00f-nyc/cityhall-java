@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
@@ -90,8 +91,8 @@ public class Client {
     	public HttpResponse run() throws Exception;
     }
     
-    private static String sanitizePath(String path) {
-    	if ((path == null) || (path == "")) {
+    public static String sanitizePath(String path) {
+    	if (StringUtils.isBlank(path) || path.equals("/")) {
     		return "/";
     	}
     	
