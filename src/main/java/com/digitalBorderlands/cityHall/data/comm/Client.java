@@ -33,6 +33,23 @@ import com.google.gson.JsonSyntaxException;;
 public class Client {
 	public Client(String apiUrl) {
 		this.target = null;
+		
+		this.apiPath = "";
+		String actualUrl = apiUrl;
+		if (apiUrl.toLowerCase().startsWith("http://") && apiUrl.substring(7).indexOf('/') > 0) {
+			int index = apiUrl.substring(7).indexOf('/');
+			this.apiPath = apiUrl.substring(7+index);
+			actualUrl = apiUrl.substring(0, 7+index);
+		} else if (!apiUrl.toLowerCase().startsWith("http://") && apiUrl.indexOf('/') > 0) {
+			int index = apiUrl.indexOf('/');
+			this.apiPath = apiUrl.substring(index);
+			actualUrl = apiUrl.substring(0, index);
+		}
+		
+		if (this.apiPath.endsWith("/")) {
+			this.apiPath = this.apiPath.substring(0, this.apiPath.length()-1);
+		}
+		
 		final SocketConfig socketConfig = SocketConfig.custom()
                 .setSoTimeout(15000)
                 .build();
@@ -41,7 +58,7 @@ public class Client {
                 .setDefaultSocketConfig(socketConfig)
                 .setConnectionManager(this.connManager);
 		this.client = this.clientBuilder.build();
-		this.target = HttpHost.create(apiUrl);
+		this.target = HttpHost.create(actualUrl);
 		this.open = true;
 		this.context = HttpClientContext.create();
 	}
@@ -62,6 +79,8 @@ public class Client {
     protected PoolingHttpClientConnectionManager connManager;
     protected HttpClientBuilder clientBuilder;
     protected HttpClientContext context;
+    protected String apiPath;
+    
     
     public Boolean isOpen() {
     	return this.open;
@@ -70,11 +89,31 @@ public class Client {
     private interface serverCall {
     	public HttpResponse run() throws Exception;
     }
+    
+    private static String sanitizePath(String path) {
+    	if ((path == null) || (path == "")) {
+    		return "/";
+    	}
+    	
+    	char first = path.charAt(0);
+    	char last = path.charAt(path.length()-1);
+
+    	if ((first == '/') && (last == '/')) {
+    		return path;
+    	} else if ((first != '/') && (last == '/')) {
+    		return String.format("/%s", path);
+    	} else if ((first == '/') && (last != '/')) {
+    		return String.format("%s/", path);
+    	}
+    	
+    	return String.format("/%s/", path);
+    }
 	
-	private static URI uriFromParts(String location, Map<String, String> queryParams) throws CityHallException {
+	private URI uriFromParts(String location, Map<String, String> queryParams) throws CityHallException {
 		URIBuilder builder;
 		try {
-			builder = new URIBuilder(location);
+			String fullPath = String.format("%s%s", this.apiPath, Client.sanitizePath(location));
+			builder = new URIBuilder(fullPath);
 				
 			if (queryParams != null) {
 				for (Entry<String, String> entry: queryParams.entrySet()) {
@@ -125,7 +164,7 @@ public class Client {
 	
 	public <T extends BaseResponse> T post(String location, Map<String, String> body, Map<String, String> queryParams, Class<T> type) throws CityHallException {
 		serverCall call = () -> {
-			HttpPost httpPost = new HttpPost(Client.uriFromParts(location, queryParams));
+			HttpPost httpPost = new HttpPost(this.uriFromParts(location, queryParams));
 			String bodyJson = Client.gson.toJson(body, body.getClass());
 			httpPost.setEntity(new StringEntity(bodyJson));
 			httpPost.setHeader("Accept", "application/json");
@@ -138,7 +177,7 @@ public class Client {
 
 	public <T extends BaseResponse> T get(String location, Map<String, String> queryParams, Class<T> type) throws CityHallException {
 		serverCall call = () -> {
-			HttpGet httpGet = new HttpGet(Client.uriFromParts(location, queryParams));
+			HttpGet httpGet = new HttpGet(this.uriFromParts(location, queryParams));
 			httpGet.setHeader("Accept", "application/json");
 			return this.client.execute(this.target, httpGet, this.context);
 		};
@@ -148,7 +187,7 @@ public class Client {
 
 	public <T extends BaseResponse> T delete(String location, Class<T> type) throws CityHallException {
 		serverCall call = () -> {
-			HttpDelete httpGet = new HttpDelete(location);
+			HttpDelete httpGet = new HttpDelete(this.uriFromParts(location, null));
 			httpGet.setHeader("Accept", "application/json");
 			return this.client.execute(this.target, httpGet, this.context);
 	    };
@@ -158,7 +197,7 @@ public class Client {
 	
 	public <T extends BaseResponse> T put(String location, Map<String, String> body, Class<T> type) throws CityHallException {
 		serverCall call = () -> {
-			HttpPut httpPut = new HttpPut(location);
+			HttpPut httpPut = new HttpPut(this.uriFromParts(location, null));
 			String bodyJson = Client.gson.toJson(body, body.getClass());
 			httpPut.setEntity(new StringEntity(bodyJson));
 			httpPut.setHeader("Accept", "application/json");
