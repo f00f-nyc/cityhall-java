@@ -10,28 +10,6 @@ import com.digitalBorderlands.cityHall.data.comm.ClientConfig;
 
 class ClientConfigImpl implements ClientConfig {
 	
-	public static ClientConfig New() {
-		return new ClientConfigImpl();
-	}
-	
-	public static ClientConfig New(String url) {
-		ClientConfig ret = ClientConfigImpl.New();
-		ret.setApiUrl(url);
-		return ret;
-	}
-	
-	public static ClientConfig New(String url, String username) {
-		ClientConfig ret = ClientConfigImpl.New(url);
-		ret.setUsername(username);
-		return ret;
-	}
-	
-	public static ClientConfig New(String url, String username, String password) {
-		ClientConfig ret = ClientConfigImpl.New(url, username);
-		ret.setPassword(password);
-		return ret;
-	}
-	
 	public ClientConfigImpl() {
 		Properties prop = new Properties();
 		InputStream input = null;
