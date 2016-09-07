@@ -12,13 +12,11 @@ import com.digitalBorderlands.cityHall.data.responses.BaseResponse;
 import com.digitalBorderlands.cityHall.data.responses.UserResponse;
 import com.digitalBorderlands.cityHall.exceptions.CityHallException;
 import com.digitalBorderlands.cityHall.exceptions.InvalidRequestException;
+import com.digitalBorderlands.cityHall.impl.Password;
+import com.digitalBorderlands.cityHall.impl.SettingsClient;
 
 public abstract class Users {
-	protected Users(Settings parent) {
-		this.parent = parent;
-	}
-	
-	private Settings parent;
+	protected SettingsClient parent;
 	
 	public UserInfo getUser(String user) throws CityHallException {
 		String location = String.format("/auth/user/%s/", user);

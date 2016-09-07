@@ -1,14 +1,16 @@
-package com.digitalBorderlands.cityHall;
+package com.digitalBorderlands.cityHall.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.digitalBorderlands.cityHall.config.Container;
+import com.digitalBorderlands.cityHall.Environments;
+import com.digitalBorderlands.cityHall.Settings;
+import com.digitalBorderlands.cityHall.Users;
+import com.digitalBorderlands.cityHall.Values;
 import com.digitalBorderlands.cityHall.data.comm.Client;
 import com.digitalBorderlands.cityHall.data.comm.ClientConfig;
-import com.digitalBorderlands.cityHall.data.comm.SettingsClient;
 import com.digitalBorderlands.cityHall.data.responses.BaseResponse;
 import com.digitalBorderlands.cityHall.data.responses.ValueResponse;
 import com.digitalBorderlands.cityHall.exceptions.CityHallException;
@@ -103,7 +105,7 @@ class SettingsImpl extends Settings implements SettingsClient {
 	}
 	
 	private Status loggedIn = Status.NotLoggedIn;
-	private final Client client = Container.Self.getComponent(Client.class);
+	private final Client client = Container.getClient();
 	private final Lock lock = new ReentrantLock();
 	private String user;
 		

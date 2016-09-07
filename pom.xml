@@ -35,12 +35,6 @@
     	<version>4.5.2</version>
     	<classifier>tests</classifier>
     </dependency>
-
-	<dependency>
-	    <groupId>org.picocontainer</groupId>
-	    <artifactId>picocontainer</artifactId>
-	    <version>2.14.1</version>
-	</dependency>
 	
 	<dependency>
 	    <groupId>com.google.code.gson</groupId>

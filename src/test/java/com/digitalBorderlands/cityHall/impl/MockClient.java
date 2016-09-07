@@ -1,18 +1,20 @@
-package com.digitalBorderlands.cityHall.data.comm;
+package com.digitalBorderlands.cityHall.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Assert;
 
-import com.digitalBorderlands.cityHall.config.Container;
+import com.digitalBorderlands.cityHall.data.comm.Client;
+import com.digitalBorderlands.cityHall.data.comm.ClientConfig;
+import com.digitalBorderlands.cityHall.data.comm.Expected;
+import com.digitalBorderlands.cityHall.data.comm.Responses;
 import com.digitalBorderlands.cityHall.data.responses.BaseResponse;
 import com.digitalBorderlands.cityHall.exceptions.CityHallException;
 
 public class MockClient {	
-	private static class ClientWithResponses extends Client {
-		public ClientWithResponses(Expected [] expected) { 
-			super("");
+	private static class ClientWithResponses implements Client {
+		public ClientWithResponses(Expected [] expected) {
 			this.expected = expected;
 			this.index = 0;
 		}
@@ -21,9 +23,10 @@ public class MockClient {
 		private int index;
 		
 		@Override
-		public void close() {
-			this.open = false;
-		}
+		public void close() { }
+		
+		@Override
+		public void open(ClientConfig config) { }
 		
 		private Expected nextResponse() {
 			Assert.assertTrue("Client called more times than responses were provided", this.index < this.expected.length);
@@ -52,8 +55,7 @@ public class MockClient {
 	}
 	
 	private static void replaceContainerClient(Client client) {
-		Container.Self.removeComponent(Client.class);
-		Container.Self.addComponent(Client.class, client);
+		Container.setClient(client);
 	}
 			
 	public static Client withRawResponses(BaseResponse resp1, BaseResponse resp2) {

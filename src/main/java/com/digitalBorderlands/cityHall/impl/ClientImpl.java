@@ -1,4 +1,4 @@
-package com.digitalBorderlands.cityHall.data.comm;
+package com.digitalBorderlands.cityHall.impl;
 
 import java.io.IOException;
 import java.net.URI;
@@ -6,7 +6,6 @@ import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
@@ -23,20 +22,28 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 
+import com.digitalBorderlands.cityHall.data.comm.Client;
+import com.digitalBorderlands.cityHall.data.comm.ClientConfig;
 import com.digitalBorderlands.cityHall.data.responses.BaseResponse;
 import com.digitalBorderlands.cityHall.exceptions.CityHallException;
 import com.digitalBorderlands.cityHall.exceptions.ErrorFromCityHallException;
 import com.digitalBorderlands.cityHall.exceptions.InvalidRequestException;
 import com.digitalBorderlands.cityHall.exceptions.InvalidResponseException;
+import com.digitalBorderlands.cityHall.exceptions.NotLoggedInException;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;;
 
-public class Client {
-	public Client(String apiUrl) {
+class ClientImpl implements Client {
+	public ClientImpl() {
+		this.open = false;
+	}
+	
+	public void open(ClientConfig config) {
 		this.target = null;
 		
 		this.apiPath = "";
-		String actualUrl = apiUrl;
+		String apiUrl = config.getApiUrl();
+		String actualUrl = config.getApiUrl();
 		if (apiUrl.toLowerCase().startsWith("http://") && apiUrl.substring(7).indexOf('/') > 0) {
 			int index = apiUrl.substring(7).indexOf('/');
 			this.apiPath = apiUrl.substring(7+index);
@@ -65,7 +72,11 @@ public class Client {
 	}
 	
 	public void close() {
-		try {
+		if (!this.isOpen()) {
+			return;
+		}
+		
+		try {	
 			this.client.close();
 			this.open = false;
 		} catch (IOException e) {
@@ -80,8 +91,7 @@ public class Client {
     protected PoolingHttpClientConnectionManager connManager;
     protected HttpClientBuilder clientBuilder;
     protected HttpClientContext context;
-    protected String apiPath;
-    
+    protected String apiPath;    
     
     public Boolean isOpen() {
     	return this.open;
@@ -90,30 +100,17 @@ public class Client {
     private interface serverCall {
     	public HttpResponse run() throws Exception;
     }
-    
-    public static String sanitizePath(String path) {
-    	if (StringUtils.isBlank(path) || path.equals("/")) {
-    		return "/";
-    	}
-    	
-    	char first = path.charAt(0);
-    	char last = path.charAt(path.length()-1);
-
-    	if ((first == '/') && (last == '/')) {
-    		return path;
-    	} else if ((first != '/') && (last == '/')) {
-    		return String.format("/%s", path);
-    	} else if ((first == '/') && (last != '/')) {
-    		return String.format("%s/", path);
-    	}
-    	
-    	return String.format("/%s/", path);
-    }
 	
+    private void ensureOpen() throws CityHallException {
+    	if (!this.isOpen()) {
+    		throw new NotLoggedInException();
+    	}
+    }
+    
 	private URI uriFromParts(String location, Map<String, String> queryParams) throws CityHallException {
 		URIBuilder builder;
 		try {
-			String fullPath = String.format("%s%s", this.apiPath, Client.sanitizePath(location));
+			String fullPath = String.format("%s%s", this.apiPath, Path.sanitize(location));
 			builder = new URIBuilder(fullPath);
 				
 			if (queryParams != null) {
@@ -160,13 +157,16 @@ public class Client {
     }
     
 	public <T extends BaseResponse> T post(String location, Map<String,String> body, Class<T> type) throws CityHallException {
-			return this.post(location, body, null, type);
+		this.ensureOpen();
+		return this.post(location, body, null, type);
 	}
 	
 	public <T extends BaseResponse> T post(String location, Map<String, String> body, Map<String, String> queryParams, Class<T> type) throws CityHallException {
+		this.ensureOpen();
+
 		serverCall call = () -> {
 			HttpPost httpPost = new HttpPost(this.uriFromParts(location, queryParams));
-			String bodyJson = Client.gson.toJson(body, body.getClass());
+			String bodyJson = ClientImpl.gson.toJson(body, body.getClass());
 			httpPost.setEntity(new StringEntity(bodyJson));
 			httpPost.setHeader("Accept", "application/json");
 			httpPost.setHeader("Content-Type", "application/json");
@@ -177,6 +177,8 @@ public class Client {
 	}
 
 	public <T extends BaseResponse> T get(String location, Map<String, String> queryParams, Class<T> type) throws CityHallException {
+		this.ensureOpen();
+		
 		serverCall call = () -> {
 			HttpGet httpGet = new HttpGet(this.uriFromParts(location, queryParams));
 			httpGet.setHeader("Accept", "application/json");
@@ -187,6 +189,8 @@ public class Client {
 	}
 
 	public <T extends BaseResponse> T delete(String location, Class<T> type) throws CityHallException {
+		this.ensureOpen();
+		
 		serverCall call = () -> {
 			HttpDelete httpGet = new HttpDelete(this.uriFromParts(location, null));
 			httpGet.setHeader("Accept", "application/json");
@@ -197,9 +201,11 @@ public class Client {
 	}
 	
 	public <T extends BaseResponse> T put(String location, Map<String, String> body, Class<T> type) throws CityHallException {
+		this.ensureOpen();
+		
 		serverCall call = () -> {
 			HttpPut httpPut = new HttpPut(this.uriFromParts(location, null));
-			String bodyJson = Client.gson.toJson(body, body.getClass());
+			String bodyJson = ClientImpl.gson.toJson(body, body.getClass());
 			httpPut.setEntity(new StringEntity(bodyJson));
 			httpPut.setHeader("Accept", "application/json");
 			httpPut.setHeader("Content-Type", "application/json");

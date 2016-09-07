@@ -1,4 +1,4 @@
-package com.digitalBorderlands.cityHall.data.comm;
+package com.digitalBorderlands.cityHall.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,9 +6,9 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Properties;
 
-import com.digitalBorderlands.cityHall.Password;
+import com.digitalBorderlands.cityHall.data.comm.ClientConfig;
 
-public class ClientConfigImpl implements ClientConfig {
+class ClientConfigImpl implements ClientConfig {
 	
 	public static ClientConfig New() {
 		return new ClientConfigImpl();

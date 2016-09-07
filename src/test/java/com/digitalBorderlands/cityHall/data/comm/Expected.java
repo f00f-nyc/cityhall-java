@@ -55,7 +55,7 @@ public class Expected {
 	
 	private void checkLocation(String location) {
 		if (this.location != null) {
-			Assert.assertEquals(location, this.location);
+			Assert.assertEquals(this.location, location);
 		}
 	}
 	
@@ -65,7 +65,8 @@ public class Expected {
 			
 			for(Entry<String, String> entry : expected.entrySet()) {
 				Assert.assertTrue(actual.containsKey(entry.getKey()));
-				Assert.assertEquals(entry.getValue(), actual.get(entry.getKey()));
+				String message = String.format("Entry for %s is incorrect", entry.getKey());
+				Assert.assertEquals(message, entry.getValue(), actual.get(entry.getKey()));
 			}
 		}
 	}

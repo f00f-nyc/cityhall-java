@@ -10,14 +10,10 @@ import com.digitalBorderlands.cityHall.data.EnvironmentRights;
 import com.digitalBorderlands.cityHall.data.responses.BaseResponse;
 import com.digitalBorderlands.cityHall.data.responses.EnvironmentResponse;
 import com.digitalBorderlands.cityHall.exceptions.CityHallException;
+import com.digitalBorderlands.cityHall.impl.SettingsClient;
 
 public abstract class Environments {
-	protected Environments(Settings parent, String defaultEnvironment) {
-		this.parent = parent;
-		this.defaultEnvironment = defaultEnvironment;
-	}
-	
-	protected final Settings parent;
+	protected SettingsClient parent;
 	protected String defaultEnvironment;
 	
 	public String getDefaultEnviornment() {
