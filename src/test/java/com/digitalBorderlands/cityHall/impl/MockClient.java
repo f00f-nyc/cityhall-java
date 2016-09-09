@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
 
 import com.digitalBorderlands.cityHall.data.comm.Client;
 import com.digitalBorderlands.cityHall.data.comm.ClientConfig;
@@ -13,7 +15,7 @@ import com.digitalBorderlands.cityHall.data.responses.BaseResponse;
 import com.digitalBorderlands.cityHall.exceptions.CityHallException;
 
 public class MockClient {	
-	private static class ClientWithResponses implements Client {
+	public static class ClientWithResponses implements Client {
 		public ClientWithResponses(Expected [] expected) {
 			this.expected = expected;
 			this.index = 0;
@@ -55,7 +57,8 @@ public class MockClient {
 	}
 	
 	private static void replaceContainerClient(Client client) {
-		Container.setClient(client);
+		PowerMockito.mockStatic(Container.client.class);
+		Mockito.when(Container.client.get()).thenReturn(client);
 	}
 			
 	public static Client withRawResponses(BaseResponse resp1, BaseResponse resp2) {

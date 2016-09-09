@@ -105,7 +105,7 @@ class SettingsImpl extends Settings implements SettingsClient {
 	}
 	
 	private Status loggedIn = Status.NotLoggedIn;
-	private final Client client = Container.getClient();
+	private final Client client = Container.client.get();
 	private final Lock lock = new ReentrantLock();
 	private String user;
 		

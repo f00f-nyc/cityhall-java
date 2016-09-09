@@ -4,14 +4,20 @@ import java.util.HashMap;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.digitalBorderlands.cityHall.data.EnvironmentInfo;
 import com.digitalBorderlands.cityHall.data.EnvironmentRights;
 import com.digitalBorderlands.cityHall.data.comm.Expected;
 import com.digitalBorderlands.cityHall.data.comm.Responses;
 import com.digitalBorderlands.cityHall.data.responses.EnvironmentResponse;
+import com.digitalBorderlands.cityHall.impl.Container;
 import com.digitalBorderlands.cityHall.impl.MockClient;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({Container.client.class})
 public class EnvironmentsTest {
 	
 	@Test

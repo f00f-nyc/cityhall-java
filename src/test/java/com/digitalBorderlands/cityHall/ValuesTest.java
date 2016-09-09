@@ -4,6 +4,9 @@ import java.util.HashMap;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.digitalBorderlands.cityHall.data.Child;
 import com.digitalBorderlands.cityHall.data.Children;
@@ -16,10 +19,13 @@ import com.digitalBorderlands.cityHall.data.comm.Responses;
 import com.digitalBorderlands.cityHall.data.responses.ChildrenResponse;
 import com.digitalBorderlands.cityHall.data.responses.HistoryResponse;
 import com.digitalBorderlands.cityHall.data.responses.ValueResponse;
+import com.digitalBorderlands.cityHall.impl.Container;
 import com.digitalBorderlands.cityHall.impl.MockClient;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({Container.client.class})
 public class ValuesTest {
-	
+
 	@Test
 	public void get() throws Exception {
 		String location = String.format("env/%s/app1/value1/", Responses.defaultEnvironment().value);

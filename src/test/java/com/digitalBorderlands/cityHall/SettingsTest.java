@@ -4,24 +4,23 @@ import java.util.HashMap;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.digitalBorderlands.cityHall.data.comm.Expected;
 import com.digitalBorderlands.cityHall.data.comm.Responses;
 import com.digitalBorderlands.cityHall.exceptions.NotLoggedInException;
+import com.digitalBorderlands.cityHall.impl.Container;
 import com.digitalBorderlands.cityHall.impl.MockClient;
 import com.digitalBorderlands.cityHall.impl.Password;
 
 /**
  * Unit test for Settings, the entry point for interfacing with City Hall
  */
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({Container.client.class})
 public class SettingsTest {
-	/*static String GetHostname() {
-		try {
-			return InetAddress.getLocalHost().getHostName();
-		} catch (UnknownHostException e) {
-			return "guest";
-		}
-	}*/
 	
 	@Test
 	public void settingsLogsIn() throws Exception {

@@ -6,26 +6,26 @@ import com.digitalBorderlands.cityHall.impl.Container;
 
 public abstract class Settings {
 	public static Settings create() throws CityHallException {
-		Settings ret = Container.getSettings();
-		ret.open(Container.getClientConfig(null, null, null));
+		Settings ret = Container.settings.get();
+		ret.open(Container.clientConfig.get(null, null, null));
 		return ret;
 	}
 	
 	public static Settings create(String url) throws CityHallException {
-		Settings ret = Container.getSettings();
-		ret.open(Container.getClientConfig(url, null, null));
+		Settings ret = Container.settings.get();
+		ret.open(Container.clientConfig.get(url, null, null));
 		return ret;
 	}
 	
 	public static Settings create(String url, String username) throws CityHallException {
-		Settings ret = Container.getSettings();
-		ret.open(Container.getClientConfig(url, username, null));
+		Settings ret = Container.settings.get();
+		ret.open(Container.clientConfig.get(url, username, null));
 		return ret;
 	}
 	
 	public static Settings create(String url, String username, String password) throws CityHallException {
-		Settings ret = Container.getSettings();
-		ret.open(Container.getClientConfig(url, username, password));
+		Settings ret = Container.settings.get();
+		ret.open(Container.clientConfig.get(url, username, password));
 		return ret;
 	}
 	

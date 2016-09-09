@@ -4,6 +4,9 @@ import java.util.HashMap;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.digitalBorderlands.cityHall.data.Rights;
 import com.digitalBorderlands.cityHall.data.UserInfo;
@@ -11,8 +14,11 @@ import com.digitalBorderlands.cityHall.data.UserRights;
 import com.digitalBorderlands.cityHall.data.comm.Responses;
 import com.digitalBorderlands.cityHall.data.responses.UserResponse;
 import com.digitalBorderlands.cityHall.exceptions.InvalidRequestException;
+import com.digitalBorderlands.cityHall.impl.Container;
 import com.digitalBorderlands.cityHall.impl.MockClient;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({Container.client.class})
 public class UsersTest {
 	
 	@Test
