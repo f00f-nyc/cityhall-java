@@ -2,15 +2,15 @@ package com.digitalBorderlands.cityHall;
 
 import org.junit.Assert;
 
-import com.digitalBorderlands.cityHall.data.comm.MockClient;
 import com.digitalBorderlands.cityHall.data.comm.Responses;
 import com.digitalBorderlands.cityHall.exceptions.NotLoggedInException;
+import com.digitalBorderlands.cityHall.impl.MockClient;
 
 public class ErrorTester {
 	public static void logOutWorks(Testable test) {
 		try {
 			MockClient.withFirstCallAfterLogin(Responses.ok(), "DELETE");
-			Settings settings = new Settings();
+			Settings settings = Settings.create();
 			settings.logout();
 			test.run(settings);
 		} catch (NotLoggedInException ex) {

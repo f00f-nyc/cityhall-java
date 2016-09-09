@@ -21,12 +21,11 @@ import org.apache.http.protocol.HttpRequestHandler;
 import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
 import org.junit.Test;
-import org.picocontainer.parameters.ConstantParameter;
 
-import com.digitalBorderlands.cityHall.config.Container;
 import com.digitalBorderlands.cityHall.data.responses.BaseResponse;
 import com.digitalBorderlands.cityHall.exceptions.ErrorFromCityHallException;
 import com.digitalBorderlands.cityHall.exceptions.InvalidRequestException;
+import com.digitalBorderlands.cityHall.impl.Container;
 
 
 public class ClientTest extends LocalServerTestBase {
@@ -99,11 +98,8 @@ public class ClientTest extends LocalServerTestBase {
 	public void getClientUsingContainer() throws Exception {
 		String success = "{\"Response\":\"Ok\"}";
 		String url = this.register(success, HttpStatus.SC_OK, null, null, null, "GET");
-		
-		Container.Self.removeComponent(Client.class);
-		Container.Self.addComponent(Client.class, Client.class, new ConstantParameter(url));
-	
-		Client client = Container.Self.getComponent(Client.class);
+
+		Client client = Container.getOpenClient(url, null, null);
 		BaseResponse response = client.get("/some_route", null, BaseResponse.class);
 		Assert.assertEquals("Ok", response.response);
 		client.close();
@@ -113,7 +109,7 @@ public class ClientTest extends LocalServerTestBase {
 	public void getReturnsSuccess() throws Exception {
 		String success = "{\"Response\":\"Ok\"}";
 		String url = this.register(success, HttpStatus.SC_OK, null, null, null, "GET");
-		Client client = new Client(url);
+		Client client = Container.getOpenClient(url, null, null);
 		BaseResponse response = client.get("/some_route", null, BaseResponse.class);
 		Assert.assertEquals("Ok", response.response);
 		Assert.assertTrue(response.message == null); 
@@ -125,7 +121,7 @@ public class ClientTest extends LocalServerTestBase {
 		HashMap<String, String> queryParams = new HashMap<String, String>();
 		queryParams.put("override", "cityhall");
 		String url = this.register(Responses.ok().toJson(), HttpStatus.SC_OK, null, null, queryParams, "GET");
-		Client client = new Client(url);
+		Client client = Container.getOpenClient(url, null, null);
 		client.get("/some_route", queryParams, BaseResponse.class);
 		client.close();
 	}
@@ -134,12 +130,12 @@ public class ClientTest extends LocalServerTestBase {
 	public void postReturnsSuccess() throws Exception {
 		String success = "{\"Response\":\"Ok\"}";
 		String url = this.register(success, HttpStatus.SC_OK, "{\"key\":\"value\"}", null, null, "POST");
-		Client client = new Client(url);
+		Client client = Container.getOpenClient(url, null, null);
 		
 		HashMap<String, String> body = new HashMap<String, String>();
 		body.put("key", "value");
 		
-		BaseResponse response = client.post("/", body, BaseResponse.class);
+		BaseResponse response = client.post("/", body, null, BaseResponse.class);
 		Assert.assertEquals("Ok", response.response);
 		Assert.assertTrue(response.message == null);
 		client.close();
@@ -152,7 +148,7 @@ public class ClientTest extends LocalServerTestBase {
 		HashMap<String, String> body = new HashMap<String, String>();
 		body.put("key", "value");
 		String url = this.register(Responses.ok().toJson(), HttpStatus.SC_OK, "{\"key\":\"value\"}", null, queryParams, "POST");
-		Client client = new Client(url);
+		Client client = Container.getOpenClient(url, null, null);
 		client.post("/some_route", body, queryParams, BaseResponse.class);
 		client.close();
 	}
@@ -161,7 +157,7 @@ public class ClientTest extends LocalServerTestBase {
 	public void deleteReturnsSuccess() throws Exception {
 		String success = "{\"Response\":\"Ok\"}";
 		String url = this.register(success, HttpStatus.SC_OK, null, null, null, "DELETE");
-		Client client = new Client(url);
+		Client client = Container.getOpenClient(url, null, null);
 		
 		BaseResponse response = client.delete("/", BaseResponse.class);
 		Assert.assertEquals("Ok", response.response);
@@ -173,7 +169,7 @@ public class ClientTest extends LocalServerTestBase {
 	public void putReturnsSuccess() throws Exception {
 		String success = "{\"Response\":\"Ok\"}";
 		String url = this.register(success, HttpStatus.SC_OK, "{\"key\":\"value\"}", null, null, "PUT");
-		Client client = new Client(url);
+		Client client = Container.getOpenClient(url, null, null);
 		
 		HashMap<String, String> body = new HashMap<String, String>();
 		body.put("key", "value");
@@ -189,7 +185,7 @@ public class ClientTest extends LocalServerTestBase {
 		String message = "Some failure message";
 		String failure = "{\"Response\":\"Failure\",\"Message\":\""+message+"\"}";
 		String url = this.register(failure, HttpStatus.SC_OK, null, null, null, "GET");
-		Client client = new Client(url);
+		Client client = Container.getOpenClient(url, null, null);
 		try {
 			client.get("/some_route", null, BaseResponse.class);
 		} catch (Exception ex) {
@@ -204,7 +200,7 @@ public class ClientTest extends LocalServerTestBase {
 		String message = "Some failure message";
 		String failure = "{\"Response\":\"Failure\",\"Message\":\""+message+"\"}";
 		String url = this.register(failure, HttpStatus.SC_OK, null, null, null, "DELETE");
-		Client client = new Client(url);
+		Client client = Container.getOpenClient(url, null, null);
 		try {
 			client.delete("/some_route", BaseResponse.class);
 		} catch (Exception ex) {
@@ -219,9 +215,9 @@ public class ClientTest extends LocalServerTestBase {
 		String message = "Some failure message";
 		String failure = "{\"Response\":\"Failure\",\"Message\":\""+message+"\"}";
 		String url = this.register(failure, HttpStatus.SC_OK, null, null, null, "POST");
-		Client client = new Client(url);
+		Client client = Container.getOpenClient(url, null, null);
 		try {
-			client.post("/some_route", new HashMap<String,String>(), BaseResponse.class);
+			client.post("/some_route", new HashMap<String,String>(), null, BaseResponse.class);
 		} catch (Exception ex) {
 			Assert.assertEquals(message, ex.getMessage());
 			client.close();
@@ -234,7 +230,7 @@ public class ClientTest extends LocalServerTestBase {
 		String message = "Some failure message";
 		String failure = "{\"Response\":\"Failure\",\"Message\":\""+message+"\"}";
 		String url = this.register(failure, HttpStatus.SC_OK, null, null, null, "PUT");
-		Client client = new Client(url);
+		Client client = Container.getOpenClient(url, null, null);
 		try {
 			client.put("/some_route", new HashMap<String,String>(), BaseResponse.class);
 		} catch (Exception ex) {
@@ -247,7 +243,7 @@ public class ClientTest extends LocalServerTestBase {
 	@Test(expected=InvalidRequestException.class)
 	public void getReturns507() throws Exception {
 		String url = this.register("Some random error mesage", HttpStatus.SC_INSUFFICIENT_STORAGE, null, null, null, "GET");
-		Client client = new Client(url);
+		Client client = Container.getOpenClient(url, null, null);
 		try {
 			client.get("/some_route", null, BaseResponse.class);
 		} catch (Exception ex) {
@@ -259,7 +255,7 @@ public class ClientTest extends LocalServerTestBase {
 	@Test(expected=InvalidRequestException.class)
 	public void deleteReturns507() throws Exception {
 		String url = this.register("Some random error mesage", HttpStatus.SC_INSUFFICIENT_STORAGE, null, null, null, "DELETE");
-		Client client = new Client(url);
+		Client client = Container.getOpenClient(url, null, null);
 		try {
 			client.delete("/some_route", BaseResponse.class);
 		} catch (Exception ex) {
@@ -271,9 +267,9 @@ public class ClientTest extends LocalServerTestBase {
 	@Test(expected=InvalidRequestException.class)
 	public void postReturns507() throws Exception {
 		String url = this.register("Some random error mesage", HttpStatus.SC_INSUFFICIENT_STORAGE, null, null, null, "POST");
-		Client client = new Client(url);
+		Client client = Container.getOpenClient(url, null, null);
 		try {
-			client.post("/some_route", new HashMap<String, String>(), BaseResponse.class);
+			client.post("/some_route", new HashMap<String, String>(), null, BaseResponse.class);
 		} catch (Exception ex) {
 			client.close();
 			throw ex;
@@ -283,7 +279,7 @@ public class ClientTest extends LocalServerTestBase {
 	@Test(expected=InvalidRequestException.class)
 	public void putReturns507() throws Exception {
 		String url = this.register("Some random error mesage", HttpStatus.SC_INSUFFICIENT_STORAGE, null, null, null, "PUT");
-		Client client = new Client(url);
+		Client client = Container.getOpenClient(url, null, null);
 		try {
 			client.put("/some_route", new HashMap<String, String>(), BaseResponse.class);
 		} catch (Exception ex) {
@@ -297,14 +293,14 @@ public class ClientTest extends LocalServerTestBase {
 		String success = "{\"Response\":\"Ok\"}";
 		String url = this.register(success, HttpStatus.SC_OK, null, "/api/some/path/", null, "GET");
 		
-		Client client = new Client(url+"/api");		
+		Client client = Container.getOpenClient(url+"/api/", null, null);		
 		BaseResponse response = client.get("/some/path/", null, BaseResponse.class);
 		Assert.assertEquals("Ok", response.response);
 		Assert.assertTrue(response.message == null);
 		client.close();
 		
 		url = url.substring(7);	//get rid of the 'http://'
-		client = new Client(url+"/api/");
+		client = Container.getOpenClient(url+"/api/", null, null);
 		client.get("some/path", null, BaseResponse.class);
 		client.close();
 	}

@@ -4,30 +4,36 @@ import java.util.HashMap;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.digitalBorderlands.cityHall.data.EnvironmentInfo;
 import com.digitalBorderlands.cityHall.data.EnvironmentRights;
 import com.digitalBorderlands.cityHall.data.comm.Expected;
-import com.digitalBorderlands.cityHall.data.comm.MockClient;
 import com.digitalBorderlands.cityHall.data.comm.Responses;
 import com.digitalBorderlands.cityHall.data.responses.EnvironmentResponse;
+import com.digitalBorderlands.cityHall.impl.Container;
+import com.digitalBorderlands.cityHall.impl.MockClient;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({Container.client.class})
 public class EnvironmentsTest {
 	
 	@Test
 	public void getDefaultEnvironment() throws Exception {
-		String location = String.format("auth/user/%s/default/", SettingsTest.GetHostname());
+		String location = "auth/user/some_user/default/";
 		Expected auth = new Expected(Responses.ok(), null);
 		Expected def = new Expected(Responses.defaultEnvironment(), "GET", location, null);
 		
 		MockClient.withRawResponses(new Expected[] { auth, def });
-		Settings settings = new Settings();
+		Settings settings = Settings.create();
 		Assert.assertEquals(Responses.defaultEnvironment().value, settings.environments.getDefaultEnviornment());
 	}
 	
 	@Test
 	public void setDefaultEnvironment() throws Exception {
-		String location = String.format("auth/user/%s/default/", SettingsTest.GetHostname());
+		String location = "auth/user/some_user/default/";
 		HashMap<String,String> body = new HashMap<String,String>();
 		body.put("env", "qa");
 		MockClient.withFirstCallAfterLogin(Responses.ok(), "POST", location, body);
@@ -37,7 +43,7 @@ public class EnvironmentsTest {
 			Assert.assertEquals("qa", settings.environments.getDefaultEnviornment());
 		};
 		
-		setDefaultEnv.run(new Settings());
+		setDefaultEnv.run(Settings.create());
 		ErrorTester.logOutWorks(setDefaultEnv);
 	}
 	
@@ -62,7 +68,7 @@ public class EnvironmentsTest {
 			}
 		};
 		
-		getEnvironment.run(new Settings());
+		getEnvironment.run(Settings.create());
 		ErrorTester.logOutWorks(getEnvironment);
 	}
 	
@@ -75,7 +81,7 @@ public class EnvironmentsTest {
 			settings.environments.create("qa");
 		};
 		
-		createEnvironment.run(new Settings());
+		createEnvironment.run(Settings.create());
 		ErrorTester.logOutWorks(createEnvironment);		
 	}
 }
