@@ -1,5 +1,12 @@
 package com.digitalBorderlands.cityHall.exceptions;
 
+/**
+ * The request going to City Hall was improperly formatted.  For example, attempting to get() a value
+ * without specifying an environment while not having a default environment.
+ *
+ * @author Alex
+ *
+ */
 public class InvalidRequestException extends CityHallException {
 	private static final long serialVersionUID = 1L;
 	

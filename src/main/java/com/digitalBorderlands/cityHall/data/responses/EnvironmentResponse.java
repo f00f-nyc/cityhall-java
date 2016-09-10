@@ -4,6 +4,11 @@ import java.util.Map;
 
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Internal class, exposed for the purposes of testing.
+ * 
+ * @author Alex
+ */
 public class EnvironmentResponse extends BaseResponse {
 	@SerializedName("Users")
 	public Map<String, Integer> users;

@@ -5,6 +5,11 @@ import java.util.Map;
 import com.digitalBorderlands.cityHall.data.responses.BaseResponse;
 import com.digitalBorderlands.cityHall.exceptions.CityHallException;
 
+/**
+ * Internal class, exposed for the purposes of testing.
+ * 
+ * @author Alex
+ */
 public interface Client {
 	<T extends BaseResponse> T post(String location, Map<String,String> body, Map<String, String> queryParams, Class<T> type) throws CityHallException;
 	

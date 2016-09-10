@@ -12,6 +12,11 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Internal class, exposed for the purposes of testing.
+ * 
+ * @author Alex
+ */
 public class BaseResponse {
 	public BaseResponse(String response, String message) {
 		this.response = response;

@@ -4,6 +4,11 @@ import java.util.HashMap;
 
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Internal class, exposed for the purposes of testing.
+ * 
+ * @author Alex
+ */
 public class UserResponse extends BaseResponse {
 	@SerializedName("Environments")
 	public HashMap<String, Integer> environments;
