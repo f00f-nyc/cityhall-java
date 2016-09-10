@@ -33,7 +33,7 @@ public abstract class Environments {
 	/**
 	 * Set a new default environment for the current logged in user.
 	 * @param defaultEnvironment the new default environment
-	 * @throws CityHallException
+	 * @throws CityHallException refer to com.digitalBorderlands.cityhall.exceptions for exceptions
 	 */
 	public void setDefaultEnvironment(String defaultEnvironment) throws CityHallException {
 		String location = String.format("auth/user/%s/default/", this.parent.getUser());
@@ -46,8 +46,8 @@ public abstract class Environments {
 	/**
 	 * Retrieve Environmental info (user permissions) for a given environment.
 	 * @param environmentName the name of the environment to query
-	 * @return
-	 * @throws CityHallException
+	 * @return the given environment info. 
+	 * @throws CityHallException refer to com.digitalBorderlands.cityhall.exceptions for exceptions
 	 */
 	public EnvironmentInfo get(String environmentName) throws CityHallException {
 		String location = String.format("auth/env/%s/", environmentName);
@@ -64,7 +64,7 @@ public abstract class Environments {
 	/**
 	 * Create an environment. Since environments, like users, are lightweight objects any user is free to create environments.
 	 * @param environmentName the new environment. The current logged in user will be automatically granted Grant permissions on it
-	 * @throws CityHallException
+	 * @throws CityHallException refer to com.digitalBorderlands.cityhall.exceptions for exceptions
 	 */
 	public void create(String environmentName) throws CityHallException {
 		String location = String.format("auth/env/%s/", environmentName);

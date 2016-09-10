@@ -18,7 +18,7 @@ public abstract class Settings {
 	 * If no password is specified in the properties file, it will use a blank password.
 	 * 
 	 * @return	        Settings object which can be used to access City Hall
-	 * @throws CityHallException
+	 * @throws CityHallException refer to com.digitalBorderlands.cityhall.exceptions for exceptions
 	 */
 	public static Settings create() throws CityHallException {
 		return Settings.create(null, null, null);
@@ -31,7 +31,7 @@ public abstract class Settings {
 	 * 
 	 * @param url       URI to override the properties file with. (e.x. "http://cityhall:8080/api/")
 	 * @return	        Settings object which can be used to access City Hall
-	 * @throws CityHallException
+	 * @throws CityHallException refer to com.digitalBorderlands.cityhall.exceptions for exceptions
 	 */
 	public static Settings create(String url) throws CityHallException {
 		return Settings.create(url, null, null);
@@ -45,7 +45,7 @@ public abstract class Settings {
 	 * @param url       URI to override the properties file with. (e.x. "http://cityhall:8080/api/")
 	 * @param username  Login name to override the properties file with.
 	 * @return	        Settings object which can be used to access City Hall
-	 * @throws CityHallException
+	 * @throws CityHallException refer to com.digitalBorderlands.cityhall.exceptions for exceptions
 	 */
 	public static Settings create(String url, String username) throws CityHallException {
 		return Settings.create(url, username, null);
@@ -60,7 +60,7 @@ public abstract class Settings {
 	 * @param username  Login name to override the properties file with.
 	 * @param password  Plain-text password to override the properties file with. 
 	 * @return	        Settings object which can be used to access City Hall
-	 * @throws CityHallException
+	 * @throws CityHallException refer to com.digitalBorderlands.cityhall.exceptions for exceptions
 	 */
 	public static Settings create(String url, String username, String password) throws CityHallException {
 		Settings ret = Container.settings.get();
@@ -99,7 +99,7 @@ public abstract class Settings {
 	
 	/**
 	 * Log out of City Hall. Any subsequent call will throw a NotLoggedInException
-	 * @throws CityHallException
+	 * @throws CityHallException refer to com.digitalBorderlands.cityhall.exceptions for exceptions
 	 */
 	public abstract void logout() throws CityHallException;
 	
@@ -114,7 +114,7 @@ public abstract class Settings {
 	 * Use this to update the password of the current logged in user. 
 	 * 
 	 * @param password   Plain-text password to update to
-	 * @throws CityHallException
+	 * @throws CityHallException refer to com.digitalBorderlands.cityhall.exceptions for exceptions
 	 */
 	public abstract void updatePassword(String password) throws CityHallException;
 	
@@ -125,7 +125,7 @@ public abstract class Settings {
 	 * 
 	 * @param path    The path to the value to be retrieved.
 	 * @return the value from the server, or null if the current logged in user doesn't have access or the value doesn't exist
-	 * @throws CityHallException
+	 * @throws CityHallException refer to com.digitalBorderlands.cityhall.exceptions for exceptions
 	 */
 	public String get(String path) throws CityHallException {
 		return this.values.get(path);

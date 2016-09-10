@@ -32,7 +32,7 @@ public abstract class Values {
 	 * 
 	 * @param path         The path to the value to be retrieved.
 	 * @return the value from the server, or null if the current logged in user doesn't have access or the value doesn't exist
-	 * @throws CityHallException
+	 * @throws CityHallException refer to com.digitalBorderlands.cityhall.exceptions for exceptions
 	 */
 	public String get(String path) throws CityHallException {
 		return this.get(path, null, null);
@@ -45,7 +45,7 @@ public abstract class Values {
 	 * @param path         The path to the value to be retrieved.
 	 * @param override     The specific override to use. If null, then use most appropriate. 
 	 * @return the value from the server, or null if the current logged in user doesn't have access or the value doesn't exist
-	 * @throws CityHallException
+	 * @throws CityHallException refer to com.digitalBorderlands.cityhall.exceptions for exceptions
 	 */
 	public String getOverride(String path, String override) throws CityHallException {
 		return this.get(path, null, override);
@@ -58,7 +58,7 @@ public abstract class Values {
 	 * @param path         The path to the value to be retrieved.
 	 * @param environment  The specific environment to use. If null, then use default. 
 	 * @return the value from the server, or null if the current logged in user doesn't have access or the value doesn't exist
-	 * @throws CityHallException
+	 * @throws CityHallException refer to com.digitalBorderlands.cityhall.exceptions for exceptions
 	 */
 	public String getEnvironment(String path, String environment) throws CityHallException {
 		return this.get(path, environment, null);
@@ -72,7 +72,7 @@ public abstract class Values {
 	 * @param environment  The specific environment to use. If null, then use default.
 	 * @param override     The specific override to use. If null, then use most appropriate.
 	 * @return the value from the server, or null if the current logged in user doesn't have access or the value doesn't exist
-	 * @throws CityHallException
+	 * @throws CityHallException refer to com.digitalBorderlands.cityhall.exceptions for exceptions
 	 */
 	public String get(String path, String environment, String override) throws CityHallException {
 		return this.getFull(path, environment, override).value;
@@ -85,7 +85,7 @@ public abstract class Values {
 	 * @param environment  The specific environment to use. If null, then use default.
 	 * @param override     The specific override to use. If null, then use most appropriate.
 	 * @return A Value object. If the `value` is null, then the current logged in user lacks permissions to access the given path
-	 * @throws CityHallException
+	 * @throws CityHallException refer to com.digitalBorderlands.cityhall.exceptions for exceptions
 	 */
 	public Value getFull(String path, String environment, String override) throws CityHallException {
 		HashMap<String, String> queryParams = new HashMap<String, String>();
@@ -107,7 +107,7 @@ public abstract class Values {
 	 * @param path         The path to the value to be queried.
 	 * @param environment  The specific environment to use.
 	 * @return A Children object with all the visible Children to the current logged in user 
-	 * @throws CityHallException
+	 * @throws CityHallException refer to com.digitalBorderlands.cityhall.exceptions for exceptions
 	 */
 	public Children getChildren(String path, String environment) throws CityHallException {
 		String sanitizedPath = Path.sanitize(path);
@@ -127,8 +127,8 @@ public abstract class Values {
 	 * @param path         The path to the value to be queried.
 	 * @param environment  The specific environment to use.
 	 * @param override     The specific override to use, if null, will retrieve default override
- 	 * @return
-	 * @throws CityHallException
+ 	 * @return history for the given environment/path?override
+	 * @throws CityHallException refer to com.digitalBorderlands.cityhall.exceptions for exceptions
 	 */
 	public History getHistory(String path, String environment, String override) throws CityHallException {
 		String sanitizedPath = Path.sanitize(path);
@@ -153,7 +153,7 @@ public abstract class Values {
 	 * @param override     The specific override to use, if null, will use default override
 	 * @param value        The new value to set at the given path
 	 * @param protect      The new protect value to set at the given path
-	 * @throws CityHallException
+	 * @throws CityHallException refer to com.digitalBorderlands.cityhall.exceptions for exceptions
 	 */
 	public void set(String path, String environment, String override, String value, Boolean protect) throws CityHallException {
 		HashMap<String, String> body = new HashMap<String, String>();
@@ -178,7 +178,7 @@ public abstract class Values {
 	 * @param environment  The specific environment to use.
 	 * @param override     The specific override to use, if null, will use default override
 	 * @param value        The new value to set at the given path
-	 * @throws CityHallException
+	 * @throws CityHallException refer to com.digitalBorderlands.cityhall.exceptions for exceptions
 	 */
 	public void set(String path, String environment, String override, String value) throws CityHallException {
 		this.set(path, environment, override, value, null);
@@ -191,7 +191,7 @@ public abstract class Values {
 	 * @param environment  The specific environment to use.
 	 * @param override     The specific override to use, if null, will use default override
 	 * @param protect      The new protect value to set at the given path
-	 * @throws CityHallException
+	 * @throws CityHallException refer to com.digitalBorderlands.cityhall.exceptions for exceptions
 	 */
 	public void set(String path, String environment, String override, boolean protect) throws CityHallException {
 		this.set(path, environment, override, null, protect);
@@ -203,7 +203,7 @@ public abstract class Values {
 	 * @param path         The path to the value to be queried.
 	 * @param environment  The specific environment to use.
 	 * @param override     The specific override to use, if null, will use default override
-	 * @throws CityHallException
+	 * @throws CityHallException refer to com.digitalBorderlands.cityhall.exceptions for exceptions
 	 */
 	public void delete(String path, String environment, String override) throws CityHallException {		
 		String overrideSend = StringUtils.isEmpty(override) ? "" : override;

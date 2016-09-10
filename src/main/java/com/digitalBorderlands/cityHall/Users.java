@@ -29,7 +29,7 @@ public abstract class Users {
 	 * 
 	 * @param user The user to retrieve
 	 * @return A UserInfo class with information about the user's permsissions.
-	 * @throws CityHallException
+	 * @throws CityHallException refer to com.digitalBorderlands.cityhall.exceptions for exceptions
 	 */
 	public UserInfo getUser(String user) throws CityHallException {
 		String location = String.format("/auth/user/%s/", user);
@@ -48,7 +48,7 @@ public abstract class Users {
 	 * 
 	 * @param user      The user name to create.  Will throw ErrorFromCityHallException if the user already exists
 	 * @param password  The plain text password for the user.
-	 * @throws CityHallException
+	 * @throws CityHallException refer to com.digitalBorderlands.cityhall.exceptions for exceptions
 	 */
 	public void createUser(String user, String password) throws CityHallException {
 		if (user.equals(this.parent.getUser())) {
@@ -66,7 +66,7 @@ public abstract class Users {
 	 * 
 	 * @param user  The user name to delete.  Must have grant access to all of his environments, or to users environment.
 	 * 
-	 * @throws CityHallException
+	 * @throws CityHallException refer to com.digitalBorderlands.cityhall.exceptions for exceptions
 	 */
 	public void deleteUser(String user) throws CityHallException {
 		String location = String.format("auth/user/%s/", user);
@@ -79,7 +79,7 @@ public abstract class Users {
 	 * @param user          the user to grant permissions to
 	 * @param environment   the environment to grant permissions on (logged in user must have Grant permissions on it)
 	 * @param rights        the rights to grant to `user`
-	 * @throws CityHallException
+	 * @throws CityHallException refer to com.digitalBorderlands.cityhall.exceptions for exceptions
 	 */
 	public void grant(String user, String environment, Rights rights) throws CityHallException {
 		HashMap<String, String> body = new HashMap<String, String>();
