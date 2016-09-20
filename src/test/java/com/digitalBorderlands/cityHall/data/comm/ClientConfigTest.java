@@ -18,7 +18,7 @@ public class ClientConfigTest {
 		Properties prop = new Properties();
 		InputStream input = null;
 		
-		input = ClientConfigTest.class.getClassLoader().getResourceAsStream("resources/cityhall/server.properties");
+		input = ClientConfigTest.class.getClassLoader().getResourceAsStream("cityhall/server.properties");
 		Assert.assertNotNull("Should be able to find a server.properties file", input);
 		
 		prop.load(input);

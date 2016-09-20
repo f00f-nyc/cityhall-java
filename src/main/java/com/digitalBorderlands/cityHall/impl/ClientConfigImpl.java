@@ -15,7 +15,7 @@ class ClientConfigImpl implements ClientConfig {
 		InputStream input = null;
 		
 		try {
-			input = ClientConfigImpl.class.getClassLoader().getResourceAsStream("resources/cityhall/server.properties");
+			input = ClientConfigImpl.class.getClassLoader().getResourceAsStream("cityhall/server.properties");
 
 			if (input != null) {
 				prop.load(input);
